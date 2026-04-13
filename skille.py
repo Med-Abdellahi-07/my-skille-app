@@ -1,94 +1,90 @@
 import streamlit as st
 
-# إعدادات واجهة التطبيق
-st.set_page_config(page_title="مسابقة التحدي الكبرى", page_icon="🏆", layout="centered")
+# Configuration de la page
+st.set_page_config(page_title="QCM sur les Matrices", page_icon="🔢", layout="centered")
 
-# --- بنك الأسئلة (40 سؤالاً) ---
-if 'questions' not in st.session_state:
-    st.session_state.questions = [
-        # السيرة النبوية
-        {"q": "ما هو عمر النبي ﷺ عند البعثة؟", "options": ["35", "40", "45"], "a": "40", "level": "سهل"},
-        {"q": "من هو أول من آمن من الرجال؟", "options": ["عمر", "أبو بكر", "علي"], "a": "أبو بكر", "level": "سهل"},
-        {"q": "ما هي الغزوة التي جُرح فيها النبي ﷺ؟", "options": ["بدر", "أحد", "الخندق"], "a": "أحد", "level": "متوسط"},
-        {"q": "في أي سنة للهجرة وقع صلح الحديبية؟", "options": ["5 هـ", "6 هـ", "7 هـ"], "a": "6 هـ", "level": "متوسط"},
-        {"q": "كم دام حصار شعب أبي طالب؟", "options": ["سنتان", "3 سنوات", "5 سنوات"], "a": "3 سنوات", "level": "متوسط"},
-        {"q": "ما اسم الناقة التي هاجر عليها النبي ﷺ؟", "options": ["القصواء", "الصهباء", "العضباء"], "a": "القصواء", "level": "متوسط"},
-        {"q": "من هو أول سفير في الإسلام؟", "options": ["معاذ بن جبل", "مصعب بن عمير", "جعفر الطيار"], "a": "مصعب بن عمير", "level": "متوسط"},
-        {"q": "[صعب 1] كم كان عدد المسلمين في غزوة تبوك؟", "options": ["10 آلاف", "20 ألف", "30 ألف"], "a": "30 ألف", "level": "صعب"},
+# Style CSS pour une interface moderne
+st.markdown("""
+    <style>
+    .stApp { background-color: #0f172a; color: #f8fafc; }
+    .main-title { color: #6366f1; text-align: center; font-size: 2.5rem; font-weight: bold; margin-bottom: 20px; }
+    .question-box { background-color: #1e293b; padding: 20px; border-radius: 15px; border-left: 5px solid #6366f1; margin-bottom: 20px; }
+    div.stButton > button {
+        width: 100%; background-color: #334155; color: white; border: 2px solid #475569;
+        border-radius: 10px; padding: 10px; transition: all 0.3s; font-size: 1.1rem;
+    }
+    div.stButton > button:hover { background-color: #6366f1; border-color: #818cf8; }
+    .feedback-vrai { color: #22c55e; font-weight: bold; text-align: center; }
+    .feedback-faux { color: #ef4444; font-weight: bold; text-align: center; }
+    </style>
+    """, unsafe_allow_html=True)
 
-        # الفتوحات الإسلامية
-        {"q": "من هو فاتح مصر؟", "options": ["خالد بن الوليد", "عمرو بن العاص", "سعد بن أبي وقاص"], "a": "عمرو بن العاص", "level": "سهل"},
-        {"q": "ما هي المعركة التي سميت بفتح الفتوح؟", "options": ["القادسية", "نهاوند", "جلولاء"], "a": "نهاوند", "level": "متوسط"},
-        {"q": "من هو القائد الذي فتح بلاد السند؟", "options": ["قتيبة بن مسلم", "محمد بن القاسم", "موسى بن نصير"], "a": "محمد بن القاسم", "level": "متوسط"},
-        {"q": "في عهد أي خليفة فُتحت الأندلس؟", "options": ["عثمان", "الوليد بن عبد الملك", "عمر بن عبد العزيز"], "a": "الوليد بن عبد الملك", "level": "متوسط"},
-        {"q": "من هو مؤسس مدينة القيروان؟", "options": ["عقبة بن نافع", "حسان بن النعمان", "طارق بن زياد"], "a": "عقبة بن نافع", "level": "متوسط"},
-        {"q": "ما هي المعركة التي جرت بين العباسيين والصينيين؟", "options": ["تلاس", "الزاب", "ملاذكرد"], "a": "تلاس", "level": "متوسط"},
-        {"q": "من هو القائد الذي استرد عكا من الصليبيين؟", "options": ["صلاح الدين", "الأشرف خليل", "بيبرس"], "a": "الأشرف خليل", "level": "متوسط"},
-        {"q": "[صعب 2] في أي معركة استشهد القادة الثلاثة: زيد وجعفر وابن رواحة؟", "options": ["اليرموك", "مؤتة", "أجنادين"], "a": "مؤتة", "level": "صعب"},
+st.markdown('<h1 class="main-title">QCM sur les Matrices</h1>', unsafe_allow_html=True)
 
-        # تاريخ موريتانيا
-        {"q": "في أي مدينة استشهد الأمير بكار ولد أحمدو؟", "options": ["تجكجة", "بوغادوم", "أطار"], "a": "بوغادوم", "level": "متوسط"},
-        {"q": "من هو بطل عملية تجكجة التي قُتل فيها كبولاني؟", "options": ["سيدي ولد مولاي الزين", "أحمد ولد أيدّه", "الشيخ ماء العينين"], "a": "سيدي ولد مولاي الزين", "level": "سهل"},
-        {"q": "المعركة التي وقعت عام 1932 وتعتبر من أواخر المعارك؟", "options": ["النيملان", "أم التونسي", "لكويشيش"], "a": "أم التونسي", "level": "متوسط"},
-        {"q": "أين وقعت معركة النيملان؟", "options": ["تكانت", "آدرار", "الحوض"], "a": "تكانت", "level": "متوسط"},
-        {"q": "من هو الأمير الذي قاد مقاومة آدرار؟", "options": ["سيد أحمد ولد أيدّه", "محمد فال", "بونا مختار"], "a": "سيد أحمد ولد أيدّه", "level": "متوسط"},
-        {"q": "[صعب 3] في أي سنة وقعت معركة 'الرشيد'؟", "options": ["1905", "1908", "1910"], "a": "1908", "level": "صعب"},
-        {"q": "[صعب 4] من هو القائد الفرنسي صاحب خطة التهدئة؟", "options": ["كبولاني", "غورو", "فالوت"], "a": "كبولاني", "level": "صعب"},
-        {"q": "[صعب 5] ما اسم المعركة البحرية عام 1909؟", "options": ["لكويشيش", "انواذيبو", "روصو"], "a": "لكويشيش", "level": "صعب"},
+# Liste des questions en Français (Niveau L1 avancé)
+questions = [
+    {
+        "q": "Soit A une matrice carrée d'ordre n. Si det(A) = 3, quelle est la valeur de det(2A) ?",
+        "options": ["6", "3 * 2^n", "2 * 3^n", "3^n * 2"],
+        "answer": "3 * 2^n"
+    },
+    {
+        "q": "Une matrice carrée A est inversible si et seulement si :",
+        "options": ["det(A) = 0", "rg(A) < n", "det(A) ≠ 0", "A est symétrique"],
+        "answer": "det(A) ≠ 0"
+    },
+    {
+        "q": "Quelle est la trace de la matrice résultant de AB - BA ?",
+        "options": ["1", "det(A)det(B)", "0", "-1"],
+        "answer": "0"
+    },
+    {
+        "q": "Si A et B sont deux matrices symétriques, alors AB est symétrique si :",
+        "options": ["Toujours vrai", "AB = BA", "A = B", "Jamais vrai"],
+        "answer": "AB = BA"
+    },
+    {
+        "q": "Le rang d'une matrice (rg(A)) est défini comme :",
+        "options": ["Le nombre total de colonnes", "La dimension du noyau Ker(A)", "Le nombre maximal de lignes linéairement indépendantes", "La somme des éléments diagonaux"],
+        "answer": "Le nombre maximal de lignes linéairement indépendantes"
+    }
+]
 
-        # تاريخ الحركة الإسلامية
-        {"q": "أين تأسست جماعة الإخوان المسلمون؟", "options": ["القاهرة", "الإسماعيلية", "طنطا"], "a": "الإسماعيلية", "level": "متوسط"},
-        {"q": "من هو مؤسس الحركة السنوسية؟", "options": ["عمر المختار", "محمد بن علي السنوسي", "إدريس"], "a": "محمد بن علي السنوسي", "level": "متوسط"},
-        {"q": "ما اسم حركة المهدي في السودان؟", "options": ["الأنصار", "الختمية", "المهدية"], "a": "المهدية", "level": "سهل"},
-        {"q": "من هو صاحب كتاب المصطلحات الأربعة؟", "options": ["إقبال", "المودودي", "الندوي"], "a": "المودودي", "level": "متوسط"},
-        {"q": "الحركة التي قادت الجهاد في القوقاز ضد الروس؟", "options": ["المريدين", "طالبان", "النهضة"], "a": "المريدين", "level": "متوسط"},
-        {"q": "[صعب 6] من أسس جمعية العلماء المسلمين الجزائريين؟", "options": ["مالك بن نبي", "بن باديس", "الإبراهيمي"], "a": "بن باديس", "level": "صعب"},
-        {"q": "في أي عام ألغيت الخلافة العثمانية؟", "options": ["1922", "1924", "1926"], "a": "1924", "level": "متوسط"},
-        {"q": "معركة انتصر فيها المجاهدون الأفغان على السوفيت؟", "options": ["خوست", "جلال آباد", "كابل"], "a": "خوست", "level": "متوسط"},
-
-        # ترفيهية
-        {"q": "ما هو الشيء الذي له عين ولا يرى؟", "options": ["الإبرة", "المشط", "المقص"], "a": "الإبرة", "level": "سهل"},
-        {"q": "ما هو الكوكب الأحمر؟", "options": ["المريخ", "الزهرة", "المشتري"], "a": "المريخ", "level": "سهل"},
-        {"q": "كم عدد ألوان قوس قزح؟", "options": ["6", "7", "8"], "a": "7", "level": "سهل"},
-        {"q": "ما هو أسرع حيوان بري؟", "options": ["الأسد", "الفهد", "النمر"], "a": "الفهد", "level": "سهل"},
-        {"q": "ما الذي يحترق ليضيء لغيره؟", "options": ["الشمعة", "المصباح", "القمر"], "a": "الشمعة", "level": "سهل"},
-        {"q": "ما هو أثقل حيوان في العالم؟", "options": ["الفيل", "الحوت الأزرق", "القرش"], "a": "الحوت الأزرق", "level": "سهل"},
-        {"q": "ينبض بلا قلب؟", "options": ["الساعة", "المطر", "البحر"], "a": "الساعة", "level": "سهل"},
-        {"q": "[صعب 7] المعدن السائل الوحيد؟", "options": ["الذهب", "الزئبق", "الفضة"], "a": "الزئبق", "level": "صعب"}
-    ]
-
-# منطق التطبيق
-if 'idx' not in st.session_state: st.session_state.idx = 0
-if 'score' not in st.session_state: st.session_state.score = 0
-if 'finished' not in st.session_state: st.session_state.finished = False
-
-st.title("🏆 مسابقة الـ 40 سؤالاً الكبرى")
-st.divider()
+# Gestion de l'état (Session State)
+if 'score' not in st.session_state:
+    st.session_state.score = 0
+    st.session_state.current_q = 0
+    st.session_state.finished = False
+    st.session_state.feedback = ""
 
 if not st.session_state.finished:
-    item = st.session_state.questions[st.session_state.idx]
-    st.caption(f"المستوى: {item['level']} | سؤال {st.session_state.idx + 1} من 40")
-    st.subheader(item['q'])
-    
-    ans = st.radio("اختر إجابتك:", item['options'], key=f"ans_{st.session_state.idx}")
-    
-    if st.button("تأكيد الإجابة ✅"):
-        if ans == item['a']:
-            st.session_state.score += 1
-            st.success("إجابة صحيحة! 🎉")
-        else:
-            st.error(f"خطأ! الإجابة الصحيحة: {item['a']}")
+    q_idx = st.session_state.current_q
+    if q_idx < len(questions):
+        st.markdown(f'<div class="question-box"><h3>Question {q_idx + 1}</h3><p>{questions[q_idx]["q"]}</p></div>', unsafe_allow_html=True)
         
-        if st.session_state.idx + 1 < len(st.session_state.questions):
-            st.session_state.idx += 1
-            st.button("السؤال التالي ➡️")
-        else:
-            st.session_state.finished = True
-            st.rerun()
+        # Affichage du feedback précédent s'il existe
+        if st.session_state.feedback:
+            st.markdown(st.session_state.feedback, unsafe_allow_html=True)
+
+        for option in questions[q_idx]["options"]:
+            if st.button(option):
+                if option == questions[q_idx]["answer"]:
+                    st.session_state.score += 1
+                    st.session_state.feedback = '<p class="feedback-vrai">Vrai ! ✅</p>'
+                else:
+                    st.session_state.feedback = f'<p class="feedback-faux">Faux ! ❌ (La réponse était: {questions[q_idx]["answer"]})</p>'
+                
+                st.session_state.current_q += 1
+                st.rerun()
+    else:
+        st.session_state.finished = True
+        st.rerun()
 else:
     st.balloons()
-    st.header("🏁 انتهت المسابقة!")
-    st.metric("النتيجة النهائية", f"{st.session_state.score} / 40")
-    if st.button("إعادة المحاولة 🔄"):
-        st.session_state.idx = 0; st.session_state.score = 0; st.session_state.finished = False
+    st.markdown(f'<div style="text-align:center"><h2>🎊 Terminé !</h2><h1>Score: {st.session_state.score} / {len(questions)}</h1></div>', unsafe_allow_html=True)
+    if st.button("Recommencer le test"):
+        st.session_state.score = 0
+        st.session_state.current_q = 0
+        st.session_state.finished = False
+        st.session_state.feedback = ""
         st.rerun()
