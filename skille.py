@@ -9,7 +9,7 @@ if 'answered' not in st.session_state:
 if 'feedback' not in st.session_state:
     st.session_state.feedback = ""
 
-st.title("🎓 EXAMEN : MÉTHODE GRAPHIQUE (RO)")
+st.title(" MÉTHODE GRAPHIQUE (RO)")
 
 questions = [
     {
