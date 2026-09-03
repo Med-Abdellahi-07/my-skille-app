@@ -1,637 +1,2138 @@
 import streamlit as st
+import random
+import math
 
-# ── Page config ────────────────────────────────────────────────────────────────
-st.set_page_config(
-    page_title="QCM · Machine Learning",
-    page_icon="🧠",
-    layout="centered",
-    initial_sidebar_state="collapsed",
-)
+# ─────────────────────────────────────────────────────────────────────────────
+#  DONNÉES (exactement les mêmes que dans le HTML)
+# ─────────────────────────────────────────────────────────────────────────────
 
-# ── Questions ──────────────────────────────────────────────────────────────────
-QUESTIONS = [
+DATA = [
     {
-        "topic": "Fondements du ML",
-        "icon": "⚙️",
-        "color": "#38bdf8",
-        "question": "Quelle est la différence fondamentale entre la programmation classique et le Machine Learning ?",
-        "options": [
-            "La programmation classique utilise des données, le ML n'en a pas besoin",
-            "En ML, les règles sont apprises automatiquement à partir des données ; en programmation classique, elles sont écrites manuellement",
-            "Le ML est toujours plus rapide à exécuter que la programmation classique",
-            "La programmation classique ne peut traiter que du texte",
-        ],
-        "answer": 1,
-        "explanation": "En programmation classique, le développeur écrit les règles explicitement. En ML, l'algorithme découvre les règles (patterns) automatiquement à partir des données.",
-    },
-    {
-        "topic": "Vocabulaire ML",
-        "icon": "📖",
-        "color": "#a78bfa",
-        "question": "Dans un problème d'apprentissage supervisé, que représente le label (y) ?",
-        "options": [
-            "Une variable d'entrée décrivant un exemple",
-            "L'ensemble complet des données d'entraînement",
-            "La valeur cible à prédire, fournie dans les données d'entraînement",
-            "Le paramètre interne du modèle après entraînement",
-        ],
-        "answer": 2,
-        "explanation": "Le label (y) est la valeur cible que le modèle doit apprendre à prédire. Il est fourni lors de l'entraînement mais absent lors de la prédiction sur de nouvelles données.",
-    },
-    {
-        "topic": "Généralisation",
-        "icon": "🎯",
-        "color": "#34d399",
-        "question": "Pourquoi la généralisation est-elle l'objectif ultime d'un modèle ML ?",
-        "options": [
-            "Pour obtenir un score parfait sur les données d'entraînement",
-            "Pour réduire la taille du modèle et économiser de la mémoire",
-            "Pour que le modèle performe bien sur des données nouvelles, jamais vues",
-            "Pour accélérer l'entraînement du modèle",
-        ],
-        "answer": 2,
-        "explanation": "Un modèle qui mémorise les données d'entraînement (overfitting) est inutile en production. La généralisation mesure la capacité à bien prédire sur de nouvelles données réelles.",
-    },
-    {
-        "topic": "Types de tâches",
-        "icon": "🏠",
-        "color": "#fb923c",
-        "question": "Un modèle prédit le prix d'un appartement selon sa superficie. De quel type de tâche s'agit-il ?",
-        "options": [
-            "Classification binaire",
-            "Clustering non supervisé",
-            "Régression",
-            "Apprentissage par renforcement",
-        ],
-        "answer": 2,
-        "explanation": "La régression prédit une valeur continue (ici un prix ∈ ℝ). La classification prédit une catégorie discrète (spam/non-spam, malade/sain…).",
-    },
-    {
-        "topic": "Pipeline ML",
-        "icon": "⏱️",
-        "color": "#f472b6",
-        "question": "Quelle étape du pipeline ML consomme approximativement 80 % du temps réel d'un projet ?",
-        "options": [
-            "La modélisation et le choix d'algorithme",
-            "Le déploiement en production",
-            "La collecte, le nettoyage et l'exploration des données",
-            "L'évaluation des performances du modèle",
-        ],
-        "answer": 2,
-        "explanation": "La réalité du ML professionnel : 80 % du temps est consacré aux données (collecte, nettoyage, exploration), et seulement 20 % à la modélisation.",
-    },
-    {
-        "topic": "Régression vs Classification",
+        "topic": "الميزانية العامة",
         "icon": "📊",
+        "color": "#6366f1",
+        "level": "سهل",
+        "question": "ما هو التعريف الدقيق للميزانية العامة للدولة؟",
+        "options": [
+            "كشف حساب نهائي بالإيرادات المحصلة والنفقات المصروفة",
+            "تقدير تفصيلي ومعتمَد للإيرادات المتوقعة والنفقات المزمعة خلال فترة مالية محددة",
+            "النص التشريعي الذي يرخص للحكومة بجمع الأموال وإنفاقها",
+            "وثيقة محاسبية يعدها المحاسب العمومي في نهاية السنة"
+        ],
+        "answer": 1,
+        "explanation": "الميزانية وثيقة تقديرية مسبقة. الخيار الأول هو الحساب الإداري، والثالث هو قانون المالية، والرابع هو حساب التسيير."
+    },
+    {
+        "topic": "الميزانية العامة",
+        "icon": "📊",
+        "color": "#6366f1",
+        "level": "متوسط",
+        "question": "أي مبدأ يمنع خصم بعض النفقات من بعض الإيرادات قبل إدراجها في الميزانية؟",
+        "options": [
+            "مبدأ الوحدة",
+            "مبدأ عدم التخصيص",
+            "مبدأ الشمولية (العمومية)",
+            "مبدأ الوضوح والدقة"
+        ],
+        "answer": 2,
+        "explanation": "مبدأ الشمولية يفرض إدراج جميع الإيرادات والنفقات دون إجراء أي مقاصة بينها، وهذا يعزز الشفافية ويمنع التلاعب بالأرقام."
+    },
+    {
+        "topic": "الميزانية العامة",
+        "icon": "📊",
+        "color": "#6366f1",
+        "level": "متوسط",
+        "question": "مبدأ عدم التخصيص في الميزانية العامة يعني:",
+        "options": [
+            "أن كل اعتماد يُصرف في الغرض المخصص له فقط",
+            "أن الإيرادات لا تُخصص لتمويل نفقات معينة بل تُجمع في وعاء واحد",
+            "أن الميزانية تُعد لسنة واحدة فقط",
+            "أن جميع الإيرادات والنفقات تُدرج في وثيقة واحدة"
+        ],
+        "answer": 1,
+        "explanation": "انتبه للخلط الشائع: عدم التخصيص يخص الإيرادات (لا ربط إيراد بنفقة)، بينما مبدأ التخصص يخص الاعتمادات (صرفها في غرضها)."
+    },
+    {
+        "topic": "الميزانية العامة",
+        "icon": "📊",
+        "color": "#6366f1",
+        "level": "صعب",
+        "question": "أي نوع من الميزانيات يُلزم كل إدارة بتبرير كل بند من نفقاتها من الصفر كل سنة؟",
+        "options": [
+            "ميزانية البرامج والأداء",
+            "الميزانية التقليدية (ميزانية البنود)",
+            "ميزانية الأهداف (التخطيط والبرمجة والميزانية)",
+            "الميزانية الصفرية"
+        ],
+        "answer": 3,
+        "explanation": "الميزانية الصفرية تتجاهل ميزانيات السنوات السابقة وتطلب تبرير كل بند من جديد، بهدف ترشيد الإنفاق وإعادة تقييم الأولويات باستمرار."
+    },
+    {
+        "topic": "قانون المالية",
+        "icon": "⚖️",
+        "color": "#6366f1",
+        "level": "سهل",
+        "question": "من الجهة التي تُصدر قانون المالية؟",
+        "options": [
+            "وزارة المالية بمفردها",
+            "السلطة التشريعية (البرلمان) بناءً على مشروع تقدمه الحكومة",
+            "مجلس المحاسبة",
+            "الخزينة العمومية"
+        ],
+        "answer": 1,
+        "explanation": "قانون المالية يصدره البرلمان سنويًا بناءً على مشروع حكومي، وموافقته هي التي تمنح الميزانية شرعيتها القانونية والسياسية."
+    },
+    {
+        "topic": "قانون المالية",
+        "icon": "⚖️",
+        "color": "#6366f1",
+        "level": "متوسط",
+        "question": "ما الفرق الجوهري بين الميزانية العامة وقانون المالية؟",
+        "options": [
+            "الميزانية سنوية وقانون المالية متعدد السنوات",
+            "الميزانية تعدها الحكومة وقانون المالية يعده مجلس المحاسبة",
+            "الميزانية وثيقة تقديرية تتضمن الأرقام، وقانون المالية نص تشريعي يضفي الشرعية على تلك الأرقام",
+            "لا فرق بينهما، هما تسميتان لنفس الوثيقة"
+        ],
+        "answer": 2,
+        "explanation": "الميزانية = أرقام تقديرية. قانون المالية = النص التشريعي المُلزِم الذي يشرعن هذه الأرقام ويحدد قواعدها."
+    },
+    {
+        "topic": "قانون المالية",
+        "icon": "⚖️",
+        "color": "#6366f1",
+        "level": "متوسط",
+        "question": "الجزء الرابع من قانون المالية يتضمن:",
+        "options": [
+            "الأحكام العامة وسقف الإيرادات والنفقات",
+            "تفصيل الإيرادات ومصادرها",
+            "الملاحق والجداول التفصيلية وتقارير الوضع الاقتصادي والمالي",
+            "توزيع النفقات على الوزارات"
+        ],
+        "answer": 2,
+        "explanation": "أجزاء قانون المالية الأربعة: (1) الأحكام العامة (2) الإيرادات (3) النفقات (4) الملاحق والجداول."
+    },
+    {
+        "topic": "قانون المالية",
+        "icon": "⚖️",
+        "color": "#6366f1",
+        "level": "صعب",
+        "question": "عبارة «لا ضريبة بدون قانون ولا إنفاق بدون قانون» تجسد:",
+        "options": [
+            "مبدأ الشرعية المالية",
+            "مبدأ التوازن الميزانياتي",
+            "مبدأ الفصل بين الآمر بالصرف والمحاسب",
+            "مبدأ عدم تخصيص الإيرادات"
+        ],
+        "answer": 0,
+        "explanation": "هذه القاعدة تعبّر عن مبدأ الشرعية المالية، وهو الأساس القانوني الذي يجعل قانون المالية ضروريًا لكل عملية مالية للدولة."
+    },
+    {
+        "topic": "قانون المالية التكميلي",
+        "icon": "🔄",
+        "color": "#6366f1",
+        "level": "سهل",
+        "question": "متى يصدر قانون المالية التكميلي؟",
+        "options": [
+            "قبل بداية السنة المالية مع القانون الأصلي",
+            "خلال السنة المالية لتعديل أحكام القانون الأصلي",
+            "بعد انتهاء السنة المالية لإقفال الحسابات",
+            "كل خمس سنوات مع المخطط التنموي"
+        ],
+        "answer": 1,
+        "explanation": "هو أداة تصحيح تصدر أثناء السنة المالية، وليس أداة إعداد. يُسمى أيضًا القانون المعدِّل أو التعديلي."
+    },
+    {
+        "topic": "قانون المالية التكميلي",
+        "icon": "🔄",
+        "color": "#6366f1",
+        "level": "متوسط",
+        "question": "ما هي المسطرة التشريعية التي يخضع لها قانون المالية التكميلي؟",
+        "options": [
+            "يصدر بمرسوم حكومي دون حاجة إلى البرلمان",
+            "يكفي توقيع وزير المالية عليه",
+            "نفس الإجراءات التشريعية للقانون الأصلي، والمبدأ العام هو ضرورة موافقة البرلمان",
+            "يصادق عليه مجلس المحاسبة بدل البرلمان"
+        ],
+        "answer": 2,
+        "explanation": "قد تُسرَّع الإجراءات في الحالات الطارئة، لكن المبدأ العام يبقى ضرورة موافقة البرلمان، وهذا ما يضمن الشرعية الديمقراطية للتعديلات."
+    },
+    {
+        "topic": "قانون المالية التكميلي",
+        "icon": "🔄",
+        "color": "#6366f1",
+        "level": "متوسط",
+        "question": "أي مما يلي ليس من محتويات قانون المالية التكميلي؟",
+        "options": [
+            "فتح اعتمادات إضافية",
+            "إلغاء أو تخفيض اعتمادات",
+            "إعداد التقديرات الأولية لميزانية السنة المقبلة",
+            "تحويل اعتمادات بين البنود أو الوزارات"
+        ],
+        "answer": 2,
+        "explanation": "إعداد تقديرات السنة المقبلة هو من اختصاص قانون المالية الأصلي. التكميلي يعدّل ويفتح ويلغي ويحوّل داخل السنة الجارية."
+    },
+    {
+        "topic": "قانون المالية التكميلي",
+        "icon": "🔄",
+        "color": "#6366f1",
+        "level": "صعب",
+        "question": "اكتشفت الحكومة في منتصف السنة أن الإيرادات المحصلة أقل بكثير من التقديرات. أي داعٍ من دواعي اللجوء للقانون التكميلي ينطبق؟",
+        "options": [
+            "الكوارث الطبيعية والأزمات",
+            "تجاوز النفقات أو نقص الإيرادات",
+            "التعديلات التشريعية",
+            "تغير الأولويات الحكومية"
+        ],
+        "answer": 1,
+        "explanation": "هذا هو داعي «تجاوز النفقات أو نقص الإيرادات»: انحراف كبير عن التقديرات يوجب تعديل الأرقام لتعكس الواقع الجديد."
+    },
+    {
+        "topic": "النفقات العمومية",
+        "icon": "💸",
         "color": "#38bdf8",
-        "question": "Quelle est la différence entre régression et classification en apprentissage supervisé ?",
+        "level": "سهل",
+        "question": "أي مما يلي ليس من خصائص النفقة العمومية؟",
         "options": [
-            "La régression nécessite toujours plus de données que la classification",
-            "La régression prédit une valeur continue (y ∈ ℝ), la classification prédit une catégorie discrète",
-            "La classification est toujours plus précise que la régression",
-            "La régression est non-supervisée, la classification est supervisée",
+            "الصبغة النقدية",
+            "الصدور عن هيئة عامة",
+            "تحقيق ربح مالي للجهة المنفقة",
+            "الترخيص القانوني"
+        ],
+        "answer": 2,
+        "explanation": "خصائص النفقة العمومية أربع: نقدية، صادرة عن هيئة عامة، تحقق المنفعة العامة (لا الربح الخاص)، ومرخص بها قانونًا."
+    },
+    {
+        "topic": "النفقات العمومية",
+        "icon": "💸",
+        "color": "#38bdf8",
+        "level": "متوسط",
+        "question": "بناء مستشفى جديد يُصنَّف حسب الطبيعة الاقتصادية ضمن:",
+        "options": [
+            "النفقات الجارية (نفقات التسيير)",
+            "النفقات الرأسمالية (نفقات الاستثمار)",
+            "نفقات الدين العام",
+            "نفقات الإدارة العامة"
         ],
         "answer": 1,
-        "explanation": "Régression → sortie continue (prix, température). Classification → sortie discrète (spam/non-spam, bénigne/maligne). Les deux sont des tâches supervisées.",
+        "explanation": "النفقات الرأسمالية تهدف إلى تكوين أو زيادة رأس المال الإنتاجي وخلق أصول جديدة، ولها أثر إيجابي على النمو طويل الأجل."
     },
     {
-        "topic": "Apprentissage non supervisé",
-        "icon": "🔍",
-        "color": "#a78bfa",
-        "question": "Lequel de ces problèmes relève de l'apprentissage NON supervisé ?",
+        "topic": "النفقات العمومية",
+        "icon": "💸",
+        "color": "#38bdf8",
+        "level": "متوسط",
+        "question": "تصنيف النفقات إلى: دفاع وأمن، خدمات اجتماعية، خدمات اقتصادية، إدارة عامة، دين عام — يقوم على معيار:",
         "options": [
-            "Détecter si un email est un spam",
-            "Prédire si une tumeur est bénigne ou maligne",
-            "Segmenter des clients en groupes selon leurs comportements d'achat",
-            "Prédire le cours d'une action boursière",
+            "الطبيعة الاقتصادية",
+            "الجهة المنفقة",
+            "الوظيفة أو الغرض",
+            "التبويب الميزانياتي"
         ],
         "answer": 2,
-        "explanation": "La segmentation (clustering) ne nécessite pas de labels. L'algorithme découvre lui-même des groupes cachés dans les données X, sans valeur cible y.",
+        "explanation": "هذا هو التصنيف حسب الوظيفة أو الغرض. أما الطبيعة الاقتصادية فتقسمها إلى جارية ورأسمالية، والجهة المنفقة إلى مركزية ومحلية ومؤسسات عمومية."
     },
     {
-        "topic": "Renforcement",
-        "icon": "♟️",
-        "color": "#34d399",
-        "question": "AlphaGo apprend à jouer au Go. Quel type d'apprentissage est utilisé ?",
+        "topic": "النفقات العمومية",
+        "icon": "💸",
+        "color": "#38bdf8",
+        "level": "صعب",
+        "question": "مبدأ التخصص في النفقات العمومية يقضي بأن:",
         "options": [
-            "Supervisé — il apprend des parties d'experts humains",
-            "Non supervisé — il regroupe des stratégies similaires",
-            "Par renforcement — il apprend par essais/erreurs en maximisant une récompense",
-            "Semi-supervisé — il combine labels et données non étiquetées",
-        ],
-        "answer": 2,
-        "explanation": "L'apprentissage par renforcement : un agent apprend par essais/erreurs. Gagner = récompense positive. AlphaGo a joué des millions de parties contre lui-même pour s'améliorer.",
-    },
-    {
-        "topic": "Dataset",
-        "icon": "🗃️",
-        "color": "#fb923c",
-        "question": "Qu'est-ce qu'un dataset (jeu de données) en ML ?",
-        "options": [
-            "L'algorithme utilisé pour entraîner le modèle",
-            "Les paramètres internes du modèle (poids)",
-            "Un ensemble structuré d'exemples utilisés pour entraîner ou évaluer un modèle",
-            "Le résultat final produit par la prédiction",
-        ],
-        "answer": 2,
-        "explanation": "Un dataset est une collection d'exemples (lignes) avec leurs features (colonnes X) et éventuellement leurs labels (y), utilisée pour l'entraînement et l'évaluation.",
-    },
-    {
-        "topic": "Train / Test Split",
-        "icon": "✂️",
-        "color": "#f472b6",
-        "question": "Pourquoi sépare-t-on les données en ensemble d'entraînement et ensemble de test ?",
-        "options": [
-            "Pour réduire la taille du dataset et accélérer l'entraînement",
-            "Pour évaluer objectivement la généralisation sur des données non vues",
-            "Parce que le modèle ne peut pas traiter toutes les données à la fois",
-            "Pour satisfaire une obligation légale sur les données",
+            "تُنفق الأموال بأقل تكلفة لتحقيق أقصى فائدة",
+            "تُنفق الاعتمادات المخصصة لكل بند في الغرض الذي خُصصت من أجله، ولا تحويل إلا بإجراءات قانونية",
+            "تكون كل نفقة مرخصًا بها بموجب قانون",
+            "تسعى الدولة إلى التوازن بين النفقات والإيرادات"
         ],
         "answer": 1,
-        "explanation": "Le test set simule de nouvelles données inconnues, permettant d'évaluer la vraie capacité de généralisation du modèle sans biais.",
+        "explanation": "الخيار الأول هو مبدأ الاقتصاد والفعالية، والثالث مبدأ الشرعية، والرابع مبدأ التوازن. التخصص = ربط الاعتماد بغرضه."
     },
     {
-        "topic": "Overfitting",
+        "topic": "الإيرادات العمومية",
+        "icon": "💰",
+        "color": "#38bdf8",
+        "level": "سهل",
+        "question": "ما الفرق الأساسي بين الضريبة والرسم؟",
+        "options": [
+            "الضريبة تفرضها الدولة والرسم تفرضه البلدية",
+            "الضريبة تُدفع نقدًا والرسم يُدفع بشيك",
+            "الضريبة اقتطاع إلزامي دون مقابل مباشر، بينما الرسم يُدفع مقابل خدمة معينة",
+            "الضريبة سنوية والرسم شهري"
+        ],
+        "answer": 2,
+        "explanation": "غياب المقابل المباشر هو ما يميز الضريبة. الرسم يقابله خدمة محددة (استخراج وثائق، تسجيل، خدمات قضائية)."
+    },
+    {
+        "topic": "الإيرادات العمومية",
+        "icon": "💰",
+        "color": "#38bdf8",
+        "level": "متوسط",
+        "question": "ضريبة القيمة المضافة والرسوم الجمركية تُصنَّف ضمن:",
+        "options": [
+            "الضرائب المباشرة",
+            "الضرائب غير المباشرة",
+            "الإيرادات غير الضريبية",
+            "عائدات الأملاك العامة"
+        ],
+        "answer": 1,
+        "explanation": "الضرائب غير المباشرة تُفرض على الإنفاق والاستهلاك. تتميز بسهولة التحصيل واتساع الوعاء، لكنها أقل عدالة لأنها لا تراعي القدرة التكليفية."
+    },
+    {
+        "topic": "الإيرادات العمومية",
+        "icon": "💰",
+        "color": "#38bdf8",
+        "level": "متوسط",
+        "question": "«الدومين العام» في تصنيف الإيرادات يقصد به:",
+        "options": [
+            "أرباح المؤسسات العمومية",
+            "عائدات استغلال أملاك الدولة كإيجارات الأراضي والمناجم",
+            "الهبات والمساعدات الخارجية",
+            "الغرامات والمصادرات القضائية"
+        ],
+        "answer": 1,
+        "explanation": "عائدات الأملاك العامة (الدومين العام) تشمل إيجارات الأراضي والعقارات وعائدات استغلال المناجم والموارد الطبيعية."
+    },
+    {
+        "topic": "الإيرادات العمومية",
+        "icon": "💰",
+        "color": "#38bdf8",
+        "level": "صعب",
+        "question": "مبدأ الملاءمة في الإيرادات العمومية يعني:",
+        "options": [
+            "أن تكون الإيرادات كافية لتغطية النفقات",
+            "أن تكون قواعد الفرض والتحصيل واضحة ومحددة",
+            "أن يكون نظام التحصيل سهلًا ومناسبًا للمكلفين دون عناء أو تكاليف إضافية",
+            "أن يراعي النظام القدرة التكليفية للمكلفين"
+        ],
+        "answer": 2,
+        "explanation": "الملاءمة (سهولة التحصيل) تخص راحة المكلف. الخيار الأول = الكفاية، والثاني = اليقين، والرابع = العدالة."
+    },
+    {
+        "topic": "العجز في الميزانية",
         "icon": "📉",
         "color": "#38bdf8",
-        "question": "Qu'est-ce que l'overfitting (sur-apprentissage) ?",
+        "level": "سهل",
+        "question": "العجز في الميزانية هو:",
         "options": [
-            "Le modèle ne converge pas pendant l'entraînement",
-            "Le modèle mémorise les données d'entraînement mais généralise mal sur de nouvelles données",
-            "Le modèle est trop simple pour capturer les patterns des données",
-            "Le modèle prend trop de temps à s'entraîner",
+            "الفرق الإيجابي بين الإيرادات والنفقات",
+            "الفرق السلبي بين إجمالي الإيرادات وإجمالي النفقات",
+            "مجموع الديون المستحقة على الدولة",
+            "الفرق بين الاعتمادات المفتوحة والمصروفة"
         ],
         "answer": 1,
-        "explanation": "L'overfitting = excellent sur train, mauvais sur test. Le modèle a mémorisé le bruit des données au lieu d'apprendre les vrais patterns. C'est l'ennemi de la généralisation.",
+        "explanation": "العجز = نفقات أكبر من إيرادات. أما مجموع الديون فهو الدين العمومي، وهما مفهومان مختلفان رغم ارتباطهما."
     },
     {
-        "topic": "Notation mathématique",
-        "icon": "🔢",
-        "color": "#a78bfa",
-        "question": "Dans la notation f(X) → ŷ, que représente ŷ (y-chapeau) ?",
-        "options": [
-            "La valeur réelle du label dans les données",
-            "La valeur prédite par le modèle",
-            "L'erreur commise par le modèle",
-            "La moyenne des valeurs du dataset",
-        ],
-        "answer": 1,
-        "explanation": "ŷ (y-hat) est la valeur prédite par le modèle f(X). On compare ŷ à y (la vraie valeur) pour mesurer l'erreur du modèle lors de l'évaluation.",
-    },
-    {
-        "topic": "Ordre du Pipeline",
-        "icon": "🔄",
-        "color": "#34d399",
-        "question": "Quelle étape précède immédiatement la modélisation dans le pipeline ML ?",
-        "options": [
-            "Le déploiement en production",
-            "L'évaluation des performances",
-            "L'exploration — visualisation et compréhension des distributions",
-            "La mise en monitoring",
-        ],
-        "answer": 2,
-        "explanation": "Ordre du pipeline : Collecte → Nettoyage → Exploration (EDA) → Modélisation → Évaluation → Déploiement. L'exploration précède toujours la modélisation.",
-    },
-    {
-        "topic": "Avantage du ML",
-        "icon": "💡",
-        "color": "#fb923c",
-        "question": "Un filtre spam basé sur des règles manuelles est remplacé par un modèle ML. Quel est l'avantage principal ?",
-        "options": [
-            "Le modèle ML est plus simple à implémenter",
-            "Le modèle ML peut capturer des patterns complexes invisibles aux règles manuelles",
-            "Le modèle ML consomme moins de ressources informatiques",
-            "Le modèle ML ne nécessite aucune donnée d'entraînement",
-        ],
-        "answer": 1,
-        "explanation": "Les règles manuelles sont limitées et rigides. Le ML peut capturer des milliers de patterns complexes (combinaisons de mots, fréquences, expéditeurs…) impossibles à écrire à la main.",
-    },
-    {
-        "topic": "Nettoyage des données",
-        "icon": "🧹",
-        "color": "#f472b6",
-        "question": "Qu'est-ce que l'étape de nettoyage (preprocessing) dans le pipeline ML ?",
-        "options": [
-            "Choisir le meilleur algorithme de ML pour la tâche",
-            "Visualiser les distributions et corrélations des features",
-            "Gérer les valeurs manquantes, les outliers et les doublons",
-            "Déployer le modèle en production et le monitorer",
-        ],
-        "answer": 2,
-        "explanation": "Le nettoyage traite les valeurs manquantes (imputation/suppression), les outliers (valeurs aberrantes) et les doublons pour obtenir des données de qualité.",
-    },
-    {
-        "topic": "Dimensionnalité",
-        "icon": "📐",
+        "topic": "العجز في الميزانية",
+        "icon": "📉",
         "color": "#38bdf8",
-        "question": "La réduction de dimensionnalité (ex: PCA) appartient à quel type d'apprentissage ?",
+        "level": "متوسط",
+        "question": "كيف يُعبَّر عادة عن العجز في الميزانية لتسهيل المقارنة عبر الزمن ومع الدول الأخرى؟",
         "options": [
-            "Supervisé — car elle utilise les labels pour réduire les dimensions",
-            "Par renforcement — car elle optimise une récompense",
-            "Non supervisé — car elle trouve des structures cachées sans labels",
-            "Semi-supervisé — car elle combine labels et données non étiquetées",
+            "بالقيمة المطلقة بالعملة الوطنية",
+            "كنسبة مئوية من الناتج المحلي الإجمالي",
+            "كنسبة من مجموع النفقات",
+            "كنسبة من كتلة الأجور"
         ],
-        "answer": 2,
-        "explanation": "La réduction de dimensionnalité (PCA, t-SNE…) cherche des structures dans X sans utiliser y. C'est de l'apprentissage non supervisé, comme le clustering.",
+        "answer": 1,
+        "explanation": "التعبير كنسبة من الناتج المحلي الإجمالي هو المعيار المعتمد، وهو نفسه المستخدم للتعبير عن الفائض."
     },
     {
-        "topic": "Déploiement & Monitoring",
-        "icon": "📡",
+        "topic": "العجز في الميزانية",
+        "icon": "📉",
+        "color": "#38bdf8",
+        "level": "متوسط",
+        "question": "التباطؤ الاقتصادي والركود يُصنَّفان ضمن أسباب العجز:",
+        "options": [
+            "الهيكلية",
+            "الدورية (المؤقتة)",
+            "التشريعية",
+            "المحاسبية"
+        ],
+        "answer": 1,
+        "explanation": "العوامل الدورية مؤقتة ومرتبطة بالدورة الاقتصادية والأزمات. أما ضعف الهيكل الاقتصادي وارتفاع النفقات الثابتة والفساد فهي عوامل هيكلية."
+    },
+    {
+        "topic": "العجز في الميزانية",
+        "icon": "📉",
+        "color": "#38bdf8",
+        "level": "صعب",
+        "question": "«مزاحمة القطاع الخاص» كأثر من آثار العجز تعني:",
+        "options": [
+            "أن الدولة تنافس الشركات الخاصة في الأسواق التجارية",
+            "أن الاقتراض الحكومي الكبير يرفع أسعار الفائدة ويقلل فرص تمويل القطاع الخاص",
+            "أن الدولة تستولي على أصول القطاع الخاص",
+            "أن الشركات الخاصة تمتنع عن دفع الضرائب"
+        ],
+        "answer": 1,
+        "explanation": "ظاهرة المزاحمة: الاقتراض الحكومي الضخم من السوق المحلية يرفع أسعار الفائدة، فيتقلص الاستثمار الخاص ويتباطأ النمو."
+    },
+    {
+        "topic": "الفائض في الميزانية",
+        "icon": "📈",
+        "color": "#38bdf8",
+        "level": "سهل",
+        "question": "الفائض في الميزانية يتحقق عندما:",
+        "options": [
+            "تتجاوز النفقات المقدرة الإيرادات المتوقعة",
+            "تتجاوز الإيرادات المحصلة النفقات المنفقة",
+            "تتساوى الإيرادات مع النفقات تمامًا",
+            "تنخفض نسبة الدين إلى الناتج المحلي"
+        ],
+        "answer": 1,
+        "explanation": "الفائض هو الفرق الإيجابي بين الإيرادات والنفقات، ويُعبَّر عنه أيضًا كنسبة من الناتج المحلي الإجمالي."
+    },
+    {
+        "topic": "الفائض في الميزانية",
+        "icon": "📈",
+        "color": "#38bdf8",
+        "level": "متوسط",
+        "question": "ما هو «المرض الهولندي» في سياق إدارة الفائض؟",
+        "options": [
+            "إنفاق الفائض كله على الإعانات الاجتماعية",
+            "تقوية العملة الوطنية نتيجة فائض الموارد الطبيعية، ما يضر بالصناعة والزراعة ويقلل تنافسيتهما",
+            "الاعتماد المفرط على الاقتراض الخارجي",
+            "تراكم الاعتمادات غير المستعملة في نهاية السنة"
+        ],
+        "answer": 1,
+        "explanation": "المرض الهولندي تحدٍّ خاص بالدول المصدرة للموارد الطبيعية: ارتفاع أسعار الموارد يقوّي العملة فيتضرر باقي القطاعات الإنتاجية."
+    },
+    {
+        "topic": "الفائض في الميزانية",
+        "icon": "📈",
+        "color": "#38bdf8",
+        "level": "متوسط",
+        "question": "الهدف من تكوين الصناديق السيادية أو صناديق الأجيال هو:",
+        "options": [
+            "تمويل نفقات التسيير الجارية للدولة",
+            "استثمار الفائض في أصول متنوعة لتحقيق عوائد طويلة الأجل للأجيال القادمة",
+            "سداد رواتب الموظفين العموميين",
+            "تغطية العجز النقدي المؤقت للخزينة"
+        ],
+        "answer": 1,
+        "explanation": "هذه الصناديق مهمة خصوصًا في الدول التي تعتمد على موارد طبيعية ناضبة، وتستثمر في أسهم وسندات وعقارات."
+    },
+    {
+        "topic": "الفائض في الميزانية",
+        "icon": "📈",
+        "color": "#38bdf8",
+        "level": "صعب",
+        "question": "قد تحقق الدولة فائضًا فعليًا عند التنفيذ رغم عدم توقعه. أي سبب يفسر ذلك؟",
+        "options": [
+            "ارتفاع أسعار السلع الأساسية المصدَّرة",
+            "تحسن كفاءة التحصيل الضريبي",
+            "وضع تقديرات متحفظة للإيرادات والنفقات في الميزانية الأصلية",
+            "زيادة الاقتراض الخارجي"
+        ],
+        "answer": 2,
+        "explanation": "التوقعات المتحفظة سبب مدرج ضمن «السياسات المالية الحكيمة»: إذا كانت الظروف الفعلية أفضل من المتوقع تحقق فائضًا عند التنفيذ."
+    },
+    {
+        "topic": "الدين العمومي",
+        "icon": "🏛️",
+        "color": "#38bdf8",
+        "level": "سهل",
+        "question": "الدين العمومي يُعرَّف بأنه:",
+        "options": [
+            "العجز السنوي المتراكم في حساب واحد",
+            "مجموع المبالغ التي تقترضها الدولة من مصادر داخلية أو خارجية وتلتزم بسدادها مع الفوائد",
+            "الفوائد المستحقة فقط دون الأقساط",
+            "المبالغ التي تقرضها الدولة للمؤسسات العمومية"
+        ],
+        "answer": 1,
+        "explanation": "الدين العمومي التزام مالي على الدولة يترتب عليه دفعات مستقبلية (أقساط وفوائد)، وهو أداة ذات حدين."
+    },
+    {
+        "topic": "الدين العمومي",
+        "icon": "🏛️",
+        "color": "#38bdf8",
+        "level": "متوسط",
+        "question": "أذونات الخزانة تُصنَّف حسب الأجل ضمن:",
+        "options": [
+            "الدين قصير الأجل (أقل من سنة)",
+            "الدين متوسط الأجل (من سنة إلى خمس سنوات)",
+            "الدين طويل الأجل (أكثر من خمس سنوات)",
+            "الدين المكفول"
+        ],
+        "answer": 0,
+        "explanation": "أذونات الخزانة أداة دين قصير الأجل. أما السندات الحكومية فهي مثال على الدين طويل الأجل."
+    },
+    {
+        "topic": "الدين العمومي",
+        "icon": "🏛️",
+        "color": "#38bdf8",
+        "level": "متوسط",
+        "question": "الدين غير المباشر (المكفول) هو:",
+        "options": [
+            "الدين الذي تقترضه الحكومة المركزية مباشرة",
+            "الدين الذي تقترضه المؤسسات والشركات العمومية وتضمنه الحكومة المركزية",
+            "الدين الخارجي بالعملات الصعبة",
+            "الدين الناتج عن إعادة التمويل"
+        ],
+        "answer": 1,
+        "explanation": "التصنيف حسب الجهة المقترضة: مباشر (الحكومة المركزية) وغير مباشر أو مكفول (مؤسسات عمومية بضمان الدولة)."
+    },
+    {
+        "topic": "الدين العمومي",
+        "icon": "🏛️",
+        "color": "#38bdf8",
+        "level": "صعب",
+        "question": "أي المؤشرات يقيس قدرة الدولة على تغطية أقساط وفوائد الدين من إيراداتها السنوية؟",
+        "options": [
+            "نسبة الدين إلى الناتج المحلي الإجمالي",
+            "نسبة خدمة الدين إلى الإيرادات العامة",
+            "نسبة الدين الخارجي إلى الصادرات",
+            "نسبة العجز إلى النفقات"
+        ],
+        "answer": 1,
+        "explanation": "مؤشرات الدين الثلاثة: الدين/الناتج المحلي (الأهم)، خدمة الدين/الإيرادات، والدين الخارجي/الصادرات."
+    },
+    {
+        "topic": "الاعتمادات المالية",
+        "icon": "🎫",
+        "color": "#38bdf8",
+        "level": "سهل",
+        "question": "الاعتماد المالي في جوهره هو:",
+        "options": [
+            "مبلغ نقدي يُسلَّم مباشرة للجهة الحكومية",
+            "حد أقصى للإنفاق لا يجوز تجاوزه، يُمنح لغرض معين ولفترة محددة",
+            "قرض تمنحه الخزينة للوزارات",
+            "تقدير غير ملزم لحجم النفقات"
+        ],
+        "answer": 1,
+        "explanation": "الاعتماد ليس أموالًا تُسلَّم، بل إذن بالصرف وسقف أعلى، يخوّل الآمر بالصرف الالتزام والتصفية والأمر بالدفع."
+    },
+    {
+        "topic": "الاعتمادات المالية",
+        "icon": "🎫",
+        "color": "#38bdf8",
+        "level": "متوسط",
+        "question": "ما الفرق بين اعتمادات الالتزام واعتمادات الدفع؟",
+        "options": [
+            "الأولى للتسيير والثانية للاستثمار",
+            "الأولى سقف ما يمكن التعاقد عليه في السنة، والثانية سقف ما يمكن دفعه فعليًا في السنة",
+            "الأولى تمنحها الحكومة والثانية يمنحها البرلمان",
+            "الأولى سنوية والثانية شهرية"
+        ],
+        "answer": 1,
+        "explanation": "اعتماد الالتزام يغطي التعاقد حتى لو تم الدفع في سنوات لاحقة، ويُستخدم لضمان استمرارية المشاريع الكبرى متعددة السنوات."
+    },
+    {
+        "topic": "الاعتمادات المالية",
+        "icon": "🎫",
+        "color": "#38bdf8",
+        "level": "متوسط",
+        "question": "رتّب مستويات التبويب الميزانياتي من الأعم إلى الأدق:",
+        "options": [
+            "البند ← الفصل ← الباب",
+            "الفصل ← الباب ← البند",
+            "الباب ← الفصل ← البند (أو الفقرة)",
+            "الباب ← البند ← الفصل"
+        ],
+        "answer": 2,
+        "explanation": "الباب يضم نفقات متجانسة، ثم يُقسم إلى فصول، ثم إلى فقرات أو بنود وهي أدق مستويات التبويب."
+    },
+    {
+        "topic": "الاعتمادات المالية",
+        "icon": "🎫",
+        "color": "#38bdf8",
+        "level": "صعب",
+        "question": "قررت وزارة المالية حجب جزء من الاعتمادات المخصصة كإجراء احترازي لمواجهة تراجع محتمل في الإيرادات. هذه العملية تسمى:",
+        "options": [
+            "تحويل الاعتمادات",
+            "إلغاء الاعتمادات",
+            "تجميد الاعتمادات",
+            "ترحيل الاعتمادات"
+        ],
+        "answer": 2,
+        "explanation": "طرق تعديل الاعتمادات أربع: التحويل، فتح اعتمادات إضافية، الإلغاء، والتجميد (إجراء احترازي لضبط الإنفاق)."
+    },
+    {
+        "topic": "ترشيد الإنفاق",
+        "icon": "♻️",
+        "color": "#38bdf8",
+        "level": "سهل",
+        "question": "ترشيد الإنفاق العمومي يعني أساسًا:",
+        "options": [
+            "خفض النفقات العمومية بنسبة ثابتة كل سنة",
+            "تحسين كفاءة وفعالية استخدام الموارد وتوجيهها نحو الأولويات، وليس بالضرورة خفضها",
+            "إلغاء نفقات الاستثمار والاكتفاء بالتسيير",
+            "تحويل الإنفاق العمومي كليًا إلى القطاع الخاص"
+        ],
+        "answer": 1,
+        "explanation": "تنبيه مفاهيمي مهم: الترشيد ليس تقليصًا. الهدف هو تحقيق أفضل النتائج بأقل التكاليف الممكنة."
+    },
+    {
+        "topic": "ترشيد الإنفاق",
+        "icon": "♻️",
+        "color": "#38bdf8",
+        "level": "متوسط",
+        "question": "إجراء دراسات جدوى اقتصادية واجتماعية للمشاريع الكبرى قبل تنفيذها يندرج ضمن محور:",
+        "options": [
+            "التنفيذ والإدارة",
+            "الرقابة والتقييم",
+            "التخطيط والإعداد",
+            "التمويل والاقتراض"
+        ],
+        "answer": 2,
+        "explanation": "محاور الترشيد ثلاثة موزعة على دورة الميزانية: التخطيط والإعداد، التنفيذ والإدارة، الرقابة والتقييم."
+    },
+    {
+        "topic": "ترشيد الإنفاق",
+        "icon": "♻️",
+        "color": "#38bdf8",
+        "level": "متوسط",
+        "question": "ضبط كتلة الأجور وربط التوظيف بالحاجات الفعلية يقع ضمن:",
+        "options": [
+            "محور التخطيط والإعداد",
+            "محور التنفيذ والإدارة",
+            "محور الرقابة والتقييم",
+            "محور التشريع"
+        ],
+        "answer": 1,
+        "explanation": "محور التنفيذ والإدارة يشمل: الصفقات العمومية، ضبط كتلة الأجور، ترشيد نفقات التسيير، إدارة الأصول، والشراكة مع القطاع الخاص."
+    },
+    {
+        "topic": "ترشيد الإنفاق",
+        "icon": "♻️",
+        "color": "#38bdf8",
+        "level": "صعب",
+        "question": "أي مما يلي يُعد تحديًا حقيقيًا أمام ترشيد الإنفاق كما ورد في الملخص؟",
+        "options": [
+            "كثرة الاعتمادات المتاحة",
+            "صعوبة قياس الأداء في بعض القطاعات",
+            "انخفاض عدد الموظفين العموميين",
+            "بساطة الإجراءات الإدارية"
+        ],
+        "answer": 1,
+        "explanation": "تحديات الترشيد: المقاومة السياسية والاجتماعية، صعوبة قياس الأداء، الضغوط الشعبوية، الفساد وسوء الحكامة، وغياب الرؤية الاستراتيجية."
+    },
+    {
+        "topic": "المحاسبة العمومية",
+        "icon": "📒",
         "color": "#a78bfa",
-        "question": "Pourquoi le monitoring est-il crucial après le déploiement d'un modèle ML ?",
+        "level": "سهل",
+        "question": "ما الذي يميز المحاسبة العمومية عن المحاسبة الخاصة (التجارية)؟",
         "options": [
-            "Pour réentraîner le modèle chaque heure automatiquement",
-            "Pour détecter le data drift — les performances se dégradent si la distribution des données change",
-            "Pour afficher des statistiques visuelles à l'utilisateur final",
-            "Pour respecter les exigences légales de publication",
+            "تعتمد على القيد المفرد بدل المزدوج",
+            "هدفها خدمة الصالح العام لا الربح، وتخضع لقواعد قانونية صارمة ومبدأ الفصل",
+            "لا تُعد لها حسابات ختامية",
+            "لا تخضع لأي رقابة خارجية"
         ],
         "answer": 1,
-        "explanation": "Le 'data drift' : les données réelles évoluent avec le temps. Un modèle performant en janvier peut devenir mauvais en décembre. Le monitoring détecte cette dégradation.",
+        "explanation": "أوجه الاختلاف: الهدف (صالح عام لا ربح)، الإطار (قواعد قانونية صارمة محددة سلفًا)، والبنية (مبدأ الفصل بين الآمر بالصرف والمحاسب)."
     },
     {
-        "topic": "Application bancaire",
-        "icon": "🏦",
+        "topic": "المحاسبة العمومية",
+        "icon": "📒",
+        "color": "#a78bfa",
+        "level": "متوسط",
+        "question": "مبدأ القيد المزدوج في المحاسبة العمومية يقضي بأن:",
+        "options": [
+            "تُسجَّل كل عملية مالية مرتين في نفس الدفتر",
+            "تُسجَّل كل عملية مالية في جانبين (مدين ودائن) لضمان توازن الحسابات",
+            "يوقّع على كل عملية شخصان",
+            "تُراجع كل عملية من قبل جهتين رقابيتين"
+        ],
+        "answer": 1,
+        "explanation": "القيد المزدوج هو الأساس الرياضي الذي يجعل مجموع الأرصدة المدينة مساويًا لمجموع الأرصدة الدائنة في ميزان المراجعة."
+    },
+    {
+        "topic": "المحاسبة العمومية",
+        "icon": "📒",
+        "color": "#a78bfa",
+        "level": "متوسط",
+        "question": "أساس الاستحقاق (أساس الالتزام) في المحاسبة العمومية يعني تسجيل:",
+        "options": [
+            "الإيرادات عند قبضها والنفقات عند دفعها فعليًا",
+            "الإيرادات عند استحقاقها والنفقات عند الالتزام بها بغض النظر عن تاريخ القبض أو الدفع",
+            "الإيرادات فقط دون النفقات",
+            "العمليات في نهاية السنة المالية دفعة واحدة"
+        ],
+        "answer": 1,
+        "explanation": "الخيار الأول هو الأساس النقدي. ملاحظة مهمة: كثير من الدول ما زالت تعتمد أساسًا نقديًا بحتًا أو نقديًا معدَّلًا."
+    },
+    {
+        "topic": "المحاسبة العمومية",
+        "icon": "📒",
+        "color": "#a78bfa",
+        "level": "صعب",
+        "question": "ما هو الترتيب الصحيح لدورة العمليات المحاسبية العمومية؟",
+        "options": [
+            "ميزان المراجعة ← دفاتر اليومية ← دفتر الأستاذ ← الحسابات الختامية ← التقارير",
+            "دفاتر اليومية ← دفتر الأستاذ ← ميزان المراجعة ← الحسابات الختامية ← التقارير",
+            "دفتر الأستاذ ← دفاتر اليومية ← الحسابات الختامية ← ميزان المراجعة ← التقارير",
+            "الحسابات الختامية ← ميزان المراجعة ← دفتر الأستاذ ← دفاتر اليومية ← التقارير"
+        ],
+        "answer": 1,
+        "explanation": "تسجيل أولي في اليومية ← ترحيل إلى الأستاذ ← ميزان مراجعة دوري ← حسابات ختامية آخر السنة ← تقديم التقارير."
+    },
+    {
+        "topic": "المحاسب العمومي",
+        "icon": "🧾",
+        "color": "#a78bfa",
+        "level": "سهل",
+        "question": "المحاسب العمومي هو:",
+        "options": [
+            "المسؤول الإداري الذي يتخذ قرار الإنفاق",
+            "عون عمومي يُعهد إليه بتحصيل الإيرادات وصرف النفقات وحيازة الأموال والقيم وإعداد الحسابات",
+            "قاضٍ مالي في مجلس المحاسبة",
+            "موظف في المفتشية العامة للمالية"
+        ],
+        "answer": 1,
+        "explanation": "المحاسب العمومي هو المنفِّذ المادي للعمليات المالية، ويُعيَّن بقرار من السلطة المختصة ويخضع لرقابة وزارة المالية."
+    },
+    {
+        "topic": "المحاسب العمومي",
+        "icon": "🧾",
+        "color": "#a78bfa",
+        "level": "متوسط",
+        "question": "ما الذي يميز المسؤولية الشخصية للمحاسب العمومي؟",
+        "options": [
+            "تسقط تلقائيًا في حالة القوة القاهرة",
+            "يُسأل عن أي نقص أو ضياع للأموال حتى لو كان بسبب قوة قاهرة، ما لم يثبت العكس",
+            "تقتصر على الأخطاء العمدية فقط",
+            "لا تتجاوز قيمة راتبه الشهري"
+        ],
+        "answer": 1,
+        "explanation": "هذه من أشد المسؤوليات في القانون العام. وهو يُعد مدينًا شخصيًا للخزينة بالمبالغ التي تثبت عليه كعجز، من ذمته المالية الخاصة."
+    },
+    {
+        "topic": "المحاسب العمومي",
+        "icon": "🧾",
+        "color": "#a78bfa",
+        "level": "متوسط",
+        "question": "إذا وجد المحاسب العمومي مخالفة في أمر الصرف، فإنه:",
+        "options": [
+            "ينفذه على مسؤوليته ثم يبلغ وزارة المالية",
+            "يحق له رفض التنفيذ ويجب عليه تعليل رفضه كتابيًا",
+            "يحيل الملف مباشرة إلى مجلس المحاسبة",
+            "يوقف عمله حتى صدور قرار قضائي"
+        ],
+        "answer": 1,
+        "explanation": "الرفض المعلَّل كتابيًا هو سلطة المحاسب الأساسية. بعده يمكن للآمر بالصرف أن يطلب التنفيذ تحت مسؤوليته الشخصية (التسخير)."
+    },
+    {
+        "topic": "المحاسب العمومي",
+        "icon": "🧾",
+        "color": "#a78bfa",
+        "level": "صعب",
+        "question": "أي مما يلي ليس من عناصر الرقابة القبلية التي يمارسها المحاسب على أمر الصرف؟",
+        "options": [
+            "التحقق من توفر الاعتمادات وتخصصها",
+            "التحقق من صحة الالتزام والتصفية",
+            "التحقق من جدوى المشروع الاقتصادية والاجتماعية",
+            "التحقق من صفة الآمر بالصرف"
+        ],
+        "answer": 2,
+        "explanation": "تقييم الجدوى الاقتصادية من اختصاص الآمر بالصرف (الجانب الإداري والفني). رقابة المحاسب شكلية وقانونية ومحاسبية."
+    },
+    {
+        "topic": "الآمر بالصرف",
+        "icon": "✍️",
+        "color": "#a78bfa",
+        "level": "سهل",
+        "question": "من يمكن أن يكون آمرًا بالصرف؟",
+        "options": [
+            "المحاسب العمومي حصرًا",
+            "الوزير أو المدير العام لمؤسسة عمومية أو رئيس جماعة ترابية أو مفوَّض قانونًا",
+            "قاضي مجلس المحاسبة",
+            "محافظ البنك المركزي"
+        ],
+        "answer": 1,
+        "explanation": "الآمر بالصرف هو كل شخص مؤهل قانونًا لإصدار أوامر التحصيل والصرف، ومسؤول عن الجانب الإداري والفني للعمليات المالية."
+    },
+    {
+        "topic": "الآمر بالصرف",
+        "icon": "✍️",
+        "color": "#a78bfa",
+        "level": "متوسط",
+        "question": "ما هي المراحل التي يتولاها الآمر بالصرف في دورة تنفيذ النفقة؟",
+        "options": [
+            "الالتزام فقط",
+            "الالتزام والتصفية والأمر بالصرف",
+            "الالتزام والتصفية والدفع",
+            "الأمر بالصرف والدفع"
+        ],
+        "answer": 1,
+        "explanation": "قاعدة ذهبية: الآمر بالصرف يتولى المراحل الثلاث الأولى في كلتا الدورتين، والمحاسب العمومي يتولى المرحلة الرابعة (الدفع أو التحصيل)."
+    },
+    {
+        "topic": "الآمر بالصرف",
+        "icon": "✍️",
+        "color": "#a78bfa",
+        "level": "متوسط",
+        "question": "مسؤولية الميزانية للآمر بالصرف تُثار عند:",
+        "options": [
+            "ضياع الأموال التي بحوزته",
+            "تجاوز الاعتمادات المخصصة أو عدم احترام مبدأ التخصص",
+            "تأخره في إعداد الحسابات الختامية",
+            "رفضه تنفيذ أمر بالدفع"
+        ],
+        "answer": 1,
+        "explanation": "مسؤوليات الآمر بالصرف أربع: إدارية، مدنية، جنائية، ومسؤولية الميزانية (تجاوز الاعتمادات أو مخالفة قانون المالية)."
+    },
+    {
+        "topic": "الآمر بالصرف",
+        "icon": "✍️",
+        "color": "#a78bfa",
+        "level": "صعب",
+        "question": "ما الفرق بين مسؤولية الآمر بالصرف ومسؤولية المحاسب العمومي؟",
+        "options": [
+            "كلاهما يتحمل مسؤولية شخصية ومالية متطابقة",
+            "الآمر بالصرف: إدارية ومدنية وجنائية وميزانياتية؛ والمحاسب: شخصية ومالية وتأديبية وجنائية",
+            "الآمر بالصرف لا يتحمل أي مسؤولية قانونية",
+            "المحاسب العمومي لا يُسأل جنائيًا"
+        ],
+        "answer": 1,
+        "explanation": "الفارق الجوهري: المحاسب يتحمل مسؤولية شخصية ومالية من ذمته الخاصة عن الأموال، وهو ما لا يتحمله الآمر بالصرف."
+    },
+    {
+        "topic": "مبدأ الفصل",
+        "icon": "🔀",
+        "color": "#a78bfa",
+        "level": "سهل",
+        "question": "ما الهدف الأسمى من مبدأ الفصل بين الآمر بالصرف والمحاسب العمومي؟",
+        "options": [
+            "تسريع إجراءات الصرف",
+            "حماية المال العام من التلاعب والاختلاس وسوء الاستخدام",
+            "تقليص عدد الموظفين",
+            "توحيد الحسابات العمومية"
+        ],
+        "answer": 1,
+        "explanation": "الفصل بين من يقرر الإنفاق ومن ينفذه يقلل بشكل كبير من فرص الفساد، ويعزز الرقابة المتبادلة بين الطرفين."
+    },
+    {
+        "topic": "مبدأ الفصل",
+        "icon": "🔀",
+        "color": "#a78bfa",
+        "level": "متوسط",
+        "question": "ما هو «التسخير» (الأمر بالإلزام)؟",
+        "options": [
+            "أمر من مجلس المحاسبة بإيقاف صرف نفقة",
+            "طلب الآمر بالصرف من المحاسب تنفيذ الأمر بعد رفضه، تحت المسؤولية الشخصية للآمر بالصرف",
+            "تفويض المحاسب صلاحيات الآمر بالصرف",
+            "إلزام المكلف بدفع الضريبة جبرًا"
+        ],
+        "answer": 1,
+        "explanation": "التسخير يخضع لضوابط صارمة تحمي المحاسب من المسؤولية غير المبررة، وتنقل المسؤولية كاملة إلى الآمر بالصرف."
+    },
+    {
+        "topic": "مبدأ الفصل",
+        "icon": "🔀",
+        "color": "#a78bfa",
+        "level": "متوسط",
+        "question": "أي مما يلي يُعد استثناءً مقبولًا على مبدأ الفصل؟",
+        "options": [
+            "رغبة الآمر بالصرف في تسريع الإجراءات",
+            "العمليات المالية ذات المبالغ الصغيرة جدًا لتبسيط الإجراءات",
+            "غياب المحاسب العمومي في عطلة",
+            "اعتراض المستفيد على تأخر الدفع"
+        ],
+        "answer": 1,
+        "explanation": "الاستثناءات ثلاثة: المحاسبون العموميون بحكم القانون، العمليات ذات المبالغ الصغيرة، والظروف الاستثنائية (مع رقابة لاحقة)."
+    },
+    {
+        "topic": "مبدأ الفصل",
+        "icon": "🔀",
+        "color": "#a78bfa",
+        "level": "صعب",
+        "question": "وظيفة الأمر بالصرف تتعلق بالجانب ... من العملية المالية، ووظيفة المحاسبة تتعلق بالجانب ...",
+        "options": [
+            "الشكلي والقانوني / الموضوعي",
+            "الموضوعي (لماذا يُنفق؟) / الشكلي والقانوني (هل تمت وفق القوانين؟)",
+            "المحاسبي / الإداري",
+            "التنفيذي / التقريري"
+        ],
+        "answer": 1,
+        "explanation": "الآمر بالصرف يقرر وينشئ الحقوق والالتزامات (طبيعة إدارية وفنية)، والمحاسب ينفذ بعد التحقق من الشرعية (طبيعة تنفيذية ورقابية)."
+    },
+    {
+        "topic": "الالتزام بالنفقة",
+        "icon": "📝",
         "color": "#34d399",
-        "question": "Une banque veut détecter des transactions frauduleuses. C'est un exemple de :",
+        "level": "سهل",
+        "question": "الالتزام بالنفقة (Engagement) هو:",
         "options": [
-            "Régression — car on prédit le montant de la fraude",
-            "Clustering — car on groupe les transactions similaires",
-            "Classification — car on prédit fraude (1) ou non-fraude (0)",
-            "Renforcement — car le système s'améliore avec le temps",
-        ],
-        "answer": 2,
-        "explanation": "Détecter une fraude = prédire une classe binaire : frauduleux (1) ou légitime (0). C'est une classification binaire supervisée nécessitant des exemples historiques étiquetés.",
-    },
-    {
-        "topic": "Entraînement",
-        "icon": "🏋️",
-        "color": "#fb923c",
-        "question": "Qu'apprend réellement un modèle ML lors de la phase d'entraînement ?",
-        "options": [
-            "Il mémorise toutes les lignes du dataset",
-            "Il ajuste ses paramètres internes pour minimiser l'erreur entre ŷ et y",
-            "Il télécharge des règles depuis Internet",
-            "Il copie les règles écrites par le développeur",
+            "المرحلة الأخيرة في دورة تنفيذ النفقة",
+            "المرحلة الأولى التي تنشأ فيها النفقة ويتعهد فيها الدولة بالدفع",
+            "مرحلة التحقق من صحة الدين وتحديد مبلغه",
+            "الأمر الموجَّه للمحاسب بالدفع"
         ],
         "answer": 1,
-        "explanation": "L'entraînement = optimisation des paramètres (poids) du modèle pour minimiser une fonction de perte (loss). Plus l'erreur |y − ŷ| est petite, meilleur est le modèle.",
+        "explanation": "الالتزام هو نقطة الانطلاق القانونية: بدونه لا يمكن للدولة أن تصبح مدينة للغير."
     },
     {
-        "topic": "Évaluation honnête",
-        "icon": "⚠️",
-        "color": "#f472b6",
-        "question": "Quel est le risque si on évalue un modèle uniquement sur ses données d'entraînement ?",
+        "topic": "الالتزام بالنفقة",
+        "icon": "📝",
+        "color": "#34d399",
+        "level": "متوسط",
+        "question": "ما الأثر المالي المباشر لمرحلة الالتزام على الاعتماد؟",
         "options": [
-            "L'évaluation sera trop lente et coûteuse en calcul",
-            "On obtiendra des métriques trop pessimistes",
-            "On obtiendra des métriques trop optimistes — le modèle a déjà vu ces données",
-            "Il n'y a aucun risque, c'est une pratique recommandée",
+            "يتم صرف المبلغ فورًا من الخزينة",
+            "يتم حجز المبلغ من الاعتماد المخصص لتغطية نفقة مستقبلية",
+            "يتم إلغاء الاعتماد وإعادة توزيعه",
+            "يتم ترحيل الاعتماد إلى السنة المقبلة"
+        ],
+        "answer": 1,
+        "explanation": "حجز الاعتماد في مرحلة الالتزام هو ما يمنع تجاوز الاعتمادات ويمكّن الإدارة من التحكم في حجم الإنفاق المستقبلي."
+    },
+    {
+        "topic": "الالتزام بالنفقة",
+        "icon": "📝",
+        "color": "#34d399",
+        "level": "متوسط",
+        "question": "قرار تعيين موظف في وظيفة عمومية يُنشئ التزامًا من نوع:",
+        "options": [
+            "التزام ناتج عن عقد",
+            "التزام ناتج عن قرار إداري",
+            "التزام ناتج عن نص قانوني",
+            "لا يُعد التزامًا بالنفقة"
+        ],
+        "answer": 1,
+        "explanation": "أنواع الالتزامات ثلاثة: ناتجة عن عقود (صفقات، إيجار، توظيف)، عن قرارات إدارية (تعيين، إعانات)، وعن نصوص قانونية (معاشات، خدمة الدين)."
+    },
+    {
+        "topic": "الالتزام بالنفقة",
+        "icon": "📝",
+        "color": "#34d399",
+        "level": "صعب",
+        "question": "أي مما يلي ليس شرطًا لصحة الالتزام بالنفقة؟",
+        "options": [
+            "وجود اعتماد مالي كافٍ يغطي المبلغ الإجمالي",
+            "تخصص الاعتماد للغرض نفسه",
+            "موافقة مسبقة من مجلس المحاسبة",
+            "صلاحية الآمر بالصرف قانونًا أو بتفويض"
         ],
         "answer": 2,
-        "explanation": "Évaluer sur les données d'entraînement = tricher (data leakage). Le modèle les a déjà mémorisées → score artificiellement élevé qui ne reflète pas la vraie performance.",
+        "explanation": "شروط الصحة خمسة: اعتماد كافٍ، تخصص الاعتماد، صلاحية الآمر بالصرف، الاستناد لنص قانوني أو تعاقدي، واحترام الإجراءات. مجلس المحاسبة يمارس رقابة لاحقة لا مسبقة."
     },
+    {
+        "topic": "تصفية النفقة",
+        "icon": "🔍",
+        "color": "#34d399",
+        "level": "سهل",
+        "question": "الهدف الأساسي من مرحلة تصفية النفقة هو:",
+        "options": [
+            "إنشاء الالتزام القانوني على الدولة",
+            "التحقق من وجود الدين وتحديد المبلغ النهائي الواجب دفعه",
+            "تحويل المبلغ إلى حساب المستفيد",
+            "إعداد الحساب الإداري"
+        ],
+        "answer": 1,
+        "explanation": "التصفية تضمن ألا تدفع الدولة إلا ما هو مستحق عليها فعلًا وبالمبلغ الصحيح، وهي تدقيق إداري وفني قبل الأمر بالصرف."
+    },
+    {
+        "topic": "تصفية النفقة",
+        "icon": "🔍",
+        "color": "#34d399",
+        "level": "متوسط",
+        "question": "ما اسم الوثيقة التي تُعد في نهاية عملية تصفية النفقة؟",
+        "options": [
+            "أمر الصرف",
+            "سند التصفية (أو محضر التصفية)",
+            "محضر الاستلام النهائي",
+            "الحساب الإداري"
+        ],
+        "answer": 1,
+        "explanation": "سند التصفية يوضح تفاصيل النفقة والمبلغ النهائي المستحق، وهو الأساس الذي يُبنى عليه أمر الصرف."
+    },
+    {
+        "topic": "تصفية النفقة",
+        "icon": "🔍",
+        "color": "#34d399",
+        "level": "متوسط",
+        "question": "أي من الوثائق التالية تُستخدم في التحقق من إنجاز الخدمة أثناء التصفية؟",
+        "options": [
+            "الاعتماد المالي المفتوح",
+            "الفواتير الأصلية ومحاضر الاستلام وشهادات إنجاز الأعمال",
+            "الجريدة الرسمية",
+            "ميزان المراجعة الشهري"
+        ],
+        "answer": 1,
+        "explanation": "الوثائق الثبوتية تشمل الفواتير الأصلية، محاضر الاستلام المؤقتة والنهائية، شهادات الإنجاز، وتقارير الخبرة."
+    },
+    {
+        "topic": "تصفية النفقة",
+        "icon": "🔍",
+        "color": "#34d399",
+        "level": "صعب",
+        "question": "عند حساب المبلغ المستحق في التصفية، أي عنصر يُخصم من المبلغ؟",
+        "options": [
+            "الضرائب والرسوم الواجبة التطبيق",
+            "الكميات الفعلية المسلَّمة",
+            "غرامات التأخير وخصم الضمان",
+            "ملاحق العقد الإضافية"
+        ],
+        "answer": 2,
+        "explanation": "المعادلة: السعر التعاقدي × الكميات الفعلية − الخصومات (ضمان، غرامات تأخيرية) + الضرائب والرسوم ± ملاحق العقد."
+    },
+    {
+        "topic": "الأمر بالدفع",
+        "icon": "📤",
+        "color": "#34d399",
+        "level": "سهل",
+        "question": "من يصدر الأمر بالدفع ولمن يوجَّه؟",
+        "options": [
+            "المحاسب العمومي إلى الآمر بالصرف",
+            "الآمر بالصرف إلى المحاسب العمومي",
+            "وزير المالية إلى المستفيد",
+            "مجلس المحاسبة إلى الخزينة"
+        ],
+        "answer": 1,
+        "explanation": "الأمر بالدفع هو ترخيص مكتوب يصدره الآمر بالصرف ويخوّل المحاسب العمومي القيام بالدفع الفعلي."
+    },
+    {
+        "topic": "الأمر بالدفع",
+        "icon": "📤",
+        "color": "#34d399",
+        "level": "متوسط",
+        "question": "يجب أن يشير الأمر بالدفع بوضوح إلى:",
+        "options": [
+            "طبيعة الإيراد المستحق",
+            "الاعتماد المالي (الباب، الفصل، البند) الذي ستُخصم منه النفقة",
+            "رقم حساب الآمر بالصرف",
+            "تاريخ إقفال السنة المالية"
+        ],
+        "answer": 1,
+        "explanation": "هذه نقطة تمييز مهمة: الأمر بالدفع يشير إلى الاعتماد المالي، بينما الأمر بالتحصيل يشير إلى طبيعة الإيراد."
+    },
+    {
+        "topic": "الأمر بالدفع",
+        "icon": "📤",
+        "color": "#34d399",
+        "level": "متوسط",
+        "question": "أي مما يلي من الشروط الشكلية لصحة الأمر بالدفع؟",
+        "options": [
+            "أن يكون شفويًا في الحالات المستعجلة",
+            "أن يكون مكتوبًا ومؤرَّخًا وموقَّعًا من الآمر بالصرف ومختومًا بختم الإدارة",
+            "أن يُنشر في الجريدة الرسمية",
+            "أن يوقعه المستفيد قبل إرساله"
+        ],
+        "answer": 1,
+        "explanation": "احترام الإجراءات الشكلية شرط من شروط الصحة الخمسة، إلى جانب صدوره عن آمر مؤهل والاستناد لتصفية صحيحة وتحديد المبلغ والإشارة للاعتماد."
+    },
+    {
+        "topic": "الأمر بالدفع",
+        "icon": "📤",
+        "color": "#34d399",
+        "level": "صعب",
+        "question": "ما العنصر الذي يميز رقابة المحاسب على الأمر بالدفع عن رقابته على وثيقة الالتزام؟",
+        "options": [
+            "التحقق من صفة الآمر بالصرف",
+            "التحقق من توفر الاعتمادات",
+            "التحقق من عدم وجود أخطاء حسابية أو مادية في الأمر والوثائق المرفقة",
+            "التحقق من شرعية النفقة"
+        ],
+        "answer": 2,
+        "explanation": "رقابة المحاسب على الأمر بالدفع تضم خمسة عناصر، ينفرد آخرها بالتحقق من الأخطاء المادية والحسابية."
+    },
+    {
+        "topic": "الدفع",
+        "icon": "💳",
+        "color": "#34d399",
+        "level": "سهل",
+        "question": "من هو الفاعل الوحيد المسؤول عن مرحلة الدفع؟",
+        "options": [
+            "الآمر بالصرف",
+            "المحاسب العمومي",
+            "المراقب المالي",
+            "المفتش المالي"
+        ],
+        "answer": 1,
+        "explanation": "الدفع هو الإجراء المادي الذي ينهي التزام الدولة تجاه الغير، ويقوم به المحاسب العمومي وحده."
+    },
+    {
+        "topic": "الدفع",
+        "icon": "💳",
+        "color": "#34d399",
+        "level": "متوسط",
+        "question": "أي شرط ينفرد به الدفع دون باقي مراحل تنفيذ النفقة؟",
+        "options": [
+            "وجود أمر بالدفع صحيح",
+            "توفر السيولة النقدية الكافية في حساب الخزينة والتحقق من هوية المستفيد",
+            "ممارسة الرقابة القبلية",
+            "التسجيل المحاسبي"
+        ],
+        "answer": 1,
+        "explanation": "توفر السيولة والتحقق من صفة المستفيد شرطان خاصان بمرحلة الدفع، لأنها اللحظة التي تخرج فيها الأموال فعليًا."
+    },
+    {
+        "topic": "الدفع",
+        "icon": "💳",
+        "color": "#34d399",
+        "level": "متوسط",
+        "question": "متى يُسمح بالدفع النقدي في النفقات العمومية؟",
+        "options": [
+            "في جميع الحالات دون قيد",
+            "في حالات محدودة جدًا وللمبالغ الصغيرة وفق ضوابط قانونية",
+            "فقط للمبالغ التي تتجاوز حدًا معينًا",
+            "الدفع النقدي ممنوع منعًا باتًا"
+        ],
+        "answer": 1,
+        "explanation": "وسائل الدفع: التحويلات البنكية (الأكثر شيوعًا وأمانًا)، الشيكات، الدفع النقدي المحدود، والحوالات البريدية."
+    },
+    {
+        "topic": "الدفع",
+        "icon": "💳",
+        "color": "#34d399",
+        "level": "صعب",
+        "question": "ما الأثر الاقتصادي لمرحلة الدفع كما ورد في الملخص؟",
+        "options": [
+            "يقلل من كتلة الأجور في القطاع العام",
+            "يضخ الأموال في الدورة الاقتصادية ويؤثر على السيولة والنشاط الاقتصادي",
+            "يخفض نسبة الدين إلى الناتج المحلي",
+            "يرفع تلقائيًا التصنيف الائتماني للدولة"
+        ],
+        "answer": 1,
+        "explanation": "الدفع لا ينهي التزام الدولة فحسب، بل يؤثر على السيولة في الاقتصاد وعلى النشاط الاقتصادي بشكل عام."
+    },
+    {
+        "topic": "إثبات الإيرادات",
+        "icon": "🔎",
+        "color": "#fb923c",
+        "level": "سهل",
+        "question": "ما هي المرحلة الأولى في دورة تحصيل الإيرادات العمومية؟",
+        "options": [
+            "تصفية الإيرادات",
+            "الأمر بالتحصيل",
+            "إثبات الإيرادات",
+            "التحصيل الفعلي"
+        ],
+        "answer": 2,
+        "explanation": "دورة الإيراد: إثبات ← تصفية ← أمر بالتحصيل (الآمر بالصرف) ← تحصيل (المحاسب العمومي)."
+    },
+    {
+        "topic": "إثبات الإيرادات",
+        "icon": "🔎",
+        "color": "#fb923c",
+        "level": "متوسط",
+        "question": "«الواقعة المنشئة» للضريبة تعني:",
+        "options": [
+            "تاريخ صدور قانون المالية",
+            "الحدث الذي يُنشئ حق الدولة في الإيراد كتحقيق الدخل أو إنجاز صفقة أو استيراد سلعة",
+            "تاريخ إيداع الإقرار الضريبي",
+            "لحظة دفع المكلف للضريبة"
+        ],
+        "answer": 1,
+        "explanation": "إثبات الإيراد يتم عند تحقق الواقعة المنشئة، وهي نقطة الانطلاق القانونية لكل مراحل التحصيل اللاحقة."
+    },
+    {
+        "topic": "إثبات الإيرادات",
+        "icon": "🔎",
+        "color": "#fb923c",
+        "level": "متوسط",
+        "question": "أي مما يلي ليس من مصادر إثبات الإيرادات؟",
+        "options": [
+            "الإقرارات الضريبية التي يقدمها المكلفون",
+            "عقود إيجار الأملاك العامة وعقود الامتياز",
+            "ميزان المراجعة الشهري للخزينة",
+            "محاضر معاينة المخالفات وتقارير الخبرة"
+        ],
+        "answer": 2,
+        "explanation": "مصادر الإثبات: القوانين واللوائح، العقود، القرارات الإدارية، الإقرارات، والمحاضر والتقارير. ميزان المراجعة أداة محاسبية لا مصدر إثبات."
+    },
+    {
+        "topic": "إثبات الإيرادات",
+        "icon": "🔎",
+        "color": "#fb923c",
+        "level": "صعب",
+        "question": "ما طبيعة رقابة المحاسب العمومي في مرحلة إثبات الإيرادات؟",
+        "options": [
+            "رقابة مباشرة وسابقة على عملية الإثبات نفسها",
+            "رقابة غير مباشرة: يتأكد عند استلام أمر التحصيل من استناد الأمر إلى إثبات صحيح",
+            "لا يمارس أي رقابة على الإطلاق",
+            "رقابة قضائية بالتنسيق مع مجلس المحاسبة"
+        ],
+        "answer": 1,
+        "explanation": "هذه نقطة دقيقة: المحاسب لا يتدخل مباشرة في الإثبات، لكنه يمارس رقابة غير مباشرة عند وصول أمر التحصيل إليه."
+    },
+    {
+        "topic": "تصفية الإيرادات",
+        "icon": "🧮",
+        "color": "#fb923c",
+        "level": "سهل",
+        "question": "تصفية الإيرادات تهدف إلى:",
+        "options": [
+            "تحديد وجود الحق والمقدار الأولي",
+            "تحديد المبلغ النهائي للإيراد المستحق بتطبيق القوانين واللوائح",
+            "جمع الأموال من المدينين",
+            "إيداع الأموال في الخزينة العامة"
+        ],
+        "answer": 1,
+        "explanation": "الفرق الدقيق: الإثبات يحدد الوجود والمقدار الأولي، والتصفية تحدد المبلغ النهائي بعد تطبيق النسب والإعفاءات."
+    },
+    {
+        "topic": "تصفية الإيرادات",
+        "icon": "🧮",
+        "color": "#fb923c",
+        "level": "متوسط",
+        "question": "أي عنصر يُضاف إلى المبلغ في تصفية الإيرادات وليس يُخصم منه؟",
+        "options": [
+            "الإعفاءات الضريبية",
+            "الخصومات القانونية",
+            "غرامات وزيادات التأخير في الإقرار أو الدفع",
+            "الاستردادات المستحقة للمكلف"
+        ],
+        "answer": 2,
+        "explanation": "المعادلة: تطبيق النسبة على الوعاء − الإعفاءات والخصومات والاستردادات + الغرامات والزيادات."
+    },
+    {
+        "topic": "تصفية الإيرادات",
+        "icon": "🧮",
+        "color": "#fb923c",
+        "level": "متوسط",
+        "question": "كيف تساهم تصفية الإيرادات في تحقيق العدالة الضريبية؟",
+        "options": [
+            "بتخفيض الضرائب على الجميع",
+            "بتطبيق القوانين بشكل متساوٍ على جميع المكلفين مع مراعاة الإعفاءات والخصومات القانونية",
+            "بإعفاء الفئات الفقيرة من كل الضرائب",
+            "بتوحيد نسبة الضريبة لجميع المكلفين"
+        ],
+        "answer": 1,
+        "explanation": "العدالة الضريبية هنا تعني التطبيق المتساوي للقانون، بما فيه الاعتراف بالإعفاءات والخصومات المستحقة قانونًا."
+    },
+    {
+        "topic": "تصفية الإيرادات",
+        "icon": "🧮",
+        "color": "#fb923c",
+        "level": "صعب",
+        "question": "أي تحدٍّ ينفرد به تصفية الإيرادات مقارنة بتصفية النفقة؟",
+        "options": [
+            "تعقيد الوثائق الثبوتية",
+            "نشوء نزاعات مع المكلفين قد تتطلب تسوية أو لجوءًا إلى القضاء",
+            "الضغط لسرعة الإنجاز",
+            "الأخطاء البشرية في الحساب"
+        ],
+        "answer": 1,
+        "explanation": "النزاعات مع المكلفين تحدٍّ خاص بجانب الإيرادات، لأن الطرف المقابل هنا مدين للدولة وليس دائنًا لها."
+    },
+    {
+        "topic": "الأمر بالتحصيل",
+        "icon": "📥",
+        "color": "#fb923c",
+        "level": "سهل",
+        "question": "الأمر بالتحصيل هو أمر يصدره:",
+        "options": [
+            "المحاسب العمومي إلى المدين",
+            "الآمر بالصرف إلى المحاسب العمومي بتحصيل مبلغ معين من المدين",
+            "البرلمان إلى الحكومة",
+            "مجلس المحاسبة إلى الخزينة"
+        ],
+        "answer": 1,
+        "explanation": "هو إذن بالتحصيل يخوّل المحاسب العمومي البدء في إجراءات التحصيل الفعلية، ويأتي بعد الإثبات والتصفية."
+    },
+    {
+        "topic": "الأمر بالتحصيل",
+        "icon": "📥",
+        "color": "#fb923c",
+        "level": "متوسط",
+        "question": "يجب أن يشير الأمر بالتحصيل بوضوح إلى:",
+        "options": [
+            "الاعتماد المالي الذي سيُخصم منه",
+            "طبيعة الإيراد (ضريبة، رسم، غرامة، دين)",
+            "رصيد حساب الخزينة",
+            "اسم المفتش المالي المكلف"
+        ],
+        "answer": 1,
+        "explanation": "فرق جوهري: الأمر بالدفع يشير إلى الاعتماد المالي، أما الأمر بالتحصيل فيشير إلى طبيعة الإيراد."
+    },
+    {
+        "topic": "الأمر بالتحصيل",
+        "icon": "📥",
+        "color": "#fb923c",
+        "level": "متوسط",
+        "question": "لماذا تضم رقابة المحاسب على الأمر بالتحصيل أربعة عناصر بدل خمسة؟",
+        "options": [
+            "لأن الإيرادات أقل أهمية من النفقات",
+            "لأنه لا يوجد عنصر «توفر الاعتمادات» فالأمر يتعلق بإيراد لا بنفقة",
+            "لأن المحاسب لا يتحقق من صفة الآمر بالصرف",
+            "لأن الأخطاء المادية لا تُراجع في الإيرادات"
+        ],
+        "answer": 1,
+        "explanation": "العناصر الأربعة: صفة الآمر بالصرف، صحة الإثبات والتصفية، شرعية الإيراد، وعدم وجود أخطاء مادية. الاعتمادات لا محل لها هنا."
+    },
+    {
+        "topic": "الأمر بالتحصيل",
+        "icon": "📥",
+        "color": "#fb923c",
+        "level": "صعب",
+        "question": "أي مما يلي يُعد تحديًا خاصًا بمرحلة الأمر بالتحصيل؟",
+        "options": [
+            "نقص السيولة في الخزينة",
+            "التأخير في إصدار الأوامر مما يؤثر سلبًا على سيولة الخزينة العامة",
+            "المرض الهولندي",
+            "تجاوز الاعتمادات المخصصة"
+        ],
+        "answer": 1,
+        "explanation": "التأخير هنا يؤخر دخول الأموال إلى الخزينة، على عكس التأخير في أمر الدفع الذي يؤخر خروجها ويضر بسمعة الإدارة."
+    },
+    {
+        "topic": "تحصيل الإيرادات",
+        "icon": "🏦",
+        "color": "#fb923c",
+        "level": "سهل",
+        "question": "من يقوم بعملية التحصيل الفعلي للإيرادات؟",
+        "options": [
+            "الآمر بالصرف",
+            "المحاسب العمومي أو من يفوضه قانونًا",
+            "المفتش المالي",
+            "قاضي مجلس المحاسبة"
+        ],
+        "answer": 1,
+        "explanation": "التحصيل هو الإجراء المادي الذي يُدخل الأموال إلى الخزينة، ويقوم به المحاسب العمومي وحده."
+    },
+    {
+        "topic": "تحصيل الإيرادات",
+        "icon": "🏦",
+        "color": "#fb923c",
+        "level": "متوسط",
+        "question": "ما الدلالة القانونية للإيصال الرسمي الذي يُسلَّم للمدين عند التحصيل؟",
+        "options": [
+            "يمثل طلبًا للدفع في المستقبل",
+            "يُعد دليلًا على براءة ذمة المدين",
+            "يُعد التزامًا من الدولة بإرجاع المبلغ",
+            "لا قيمة قانونية له، هو إجراء شكلي"
+        ],
+        "answer": 1,
+        "explanation": "تسليم إيصال رسمي شرط من شروط صحة التحصيل، ويُعد إثباتًا لبراءة ذمة المدين تجاه الدولة."
+    },
+    {
+        "topic": "تحصيل الإيرادات",
+        "icon": "🏦",
+        "color": "#fb923c",
+        "level": "متوسط",
+        "question": "ما هو التحصيل الجبري؟",
+        "options": [
+            "تحصيل الضرائب مقدمًا قبل استحقاقها",
+            "اللجوء إلى إجراءات قانونية كالحجز على الأموال أو بيع الممتلكات عند عدم الدفع الطوعي",
+            "تحصيل المبالغ عن طريق البطاقات الائتمانية",
+            "تحويل الملف إلى مجلس المحاسبة"
+        ],
+        "answer": 1,
+        "explanation": "التحصيل الجبري وسيلة استثنائية تُستخدم عند امتناع المدين عن الدفع الطوعي، وهو ما ينفرد به جانب الإيرادات."
+    },
+    {
+        "topic": "تحصيل الإيرادات",
+        "icon": "🏦",
+        "color": "#fb923c",
+        "level": "صعب",
+        "question": "من واجبات المحاسب العمومي بعد قبض الأموال المحصلة:",
+        "options": [
+            "الاحتفاظ بها في صندوق الإدارة حتى نهاية السنة",
+            "إيداعها في حساب الخزينة العامة في أقرب وقت ممكن",
+            "توزيعها مباشرة على الوزارات المعنية",
+            "تحويلها إلى حساب الآمر بالصرف"
+        ],
+        "answer": 1,
+        "explanation": "الإيداع السريع في الخزينة يخدم مبدأ وحدة الخزينة ويمكّن من إدارة مركزية فعالة للسيولة."
+    },
+    {
+        "topic": "الرقابة القبلية",
+        "icon": "🛡️",
+        "color": "#f472b6",
+        "level": "سهل",
+        "question": "الرقابة المالية القبلية تتميز بأنها رقابة:",
+        "options": [
+            "علاجية تصحيحية تكشف الأخطاء بعد وقوعها",
+            "وقائية تمنع وقوع الأخطاء والمخالفات قبل حدوثها",
+            "قضائية تُسلط عقوبات مالية",
+            "استشارية غير ملزمة"
+        ],
+        "answer": 1,
+        "explanation": "الرقابة القبلية هي «خط الدفاع الأول»: تُمارس قبل إتمام العملية المالية بهدف المنع لا الكشف."
+    },
+    {
+        "topic": "الرقابة القبلية",
+        "icon": "🛡️",
+        "color": "#f472b6",
+        "level": "متوسط",
+        "question": "المراقب المالي جهاز تابع لوزارة المالية يمارس رقابة قبلية على:",
+        "options": [
+            "الحسابات الختامية للدولة",
+            "التزامات النفقات، حيث يؤشر على وثائق الالتزام بعد التأكد من الشرعية وتوفر الاعتمادات",
+            "تحصيل الضرائب من المكلفين",
+            "تقييم أداء البرامج العمومية"
+        ],
+        "answer": 1,
+        "explanation": "آليات الرقابة القبلية أربع: رقابة المحاسب العمومي (الأهم)، رقابة المراقب المالي، اللجان المتخصصة، والتأشيرة المسبقة."
+    },
+    {
+        "topic": "الرقابة القبلية",
+        "icon": "🛡️",
+        "color": "#f472b6",
+        "level": "متوسط",
+        "question": "على أي مراحل تُطبَّق الرقابة القبلية في جانب الإيرادات؟",
+        "options": [
+            "على مرحلة التحصيل فقط",
+            "على مراحل الإثبات والتصفية والأمر بالتحصيل قبل التحصيل الفعلي",
+            "على الحساب الإداري",
+            "على مرحلة إعداد الميزانية"
+        ],
+        "answer": 1,
+        "explanation": "في النفقات: الالتزام والتصفية والأمر بالدفع. وفي الإيرادات: الإثبات والتصفية والأمر بالتحصيل."
+    },
+    {
+        "topic": "الرقابة القبلية",
+        "icon": "🛡️",
+        "color": "#f472b6",
+        "level": "صعب",
+        "question": "أي مما يلي يُعد عيبًا ينفرد به الرقابة القبلية؟",
+        "options": [
+            "صعوبة استرداد الأموال المهدورة",
+            "التأخير في الكشف عن المخالفات",
+            "التركيز أحيانًا على الجوانب الشكلية والإجرائية دون التعمق في جوهر النفقة، والتأثير على سرعة الإنجاز",
+            "مقاومة الإدارات لتوصياتها"
+        ],
+        "answer": 2,
+        "explanation": "العيبان الأول والثاني والرابع خاصة بالرقابة البعدية. أما البطء والشكلية فهما التحديان المميزان للرقابة القبلية."
+    },
+    {
+        "topic": "الرقابة البعدية",
+        "icon": "🔬",
+        "color": "#f472b6",
+        "level": "سهل",
+        "question": "الرقابة المالية البعدية تُمارس:",
+        "options": [
+            "قبل تنفيذ العملية المالية",
+            "بعد تنفيذ العملية المالية للتحقق من صحتها وتقييم الأداء",
+            "أثناء إعداد مشروع الميزانية",
+            "في مرحلة الالتزام بالنفقة فقط"
+        ],
+        "answer": 1,
+        "explanation": "الرقابة البعدية هي «خط الدفاع الثاني»: علاجية وتصحيحية، تكشف الأخطاء وتحدد المسؤوليات وتقدم التوصيات."
+    },
+    {
+        "topic": "الرقابة البعدية",
+        "icon": "🔬",
+        "color": "#f472b6",
+        "level": "متوسط",
+        "question": "رقابة البرلمان على المال العام تُوصف بأنها رقابة:",
+        "options": [
+            "قضائية",
+            "محاسبية",
+            "سياسية تُمارس عبر مناقشة قانون المالية وتقارير المجالس العليا ولجان التحقيق",
+            "إدارية داخلية"
+        ],
+        "answer": 2,
+        "explanation": "الرقابة البرلمانية أساسية لتعزيز المساءلة الديمقراطية، وتشمل أيضًا طرح الأسئلة على الوزراء."
+    },
+    {
+        "topic": "الرقابة البعدية",
+        "icon": "🔬",
+        "color": "#f472b6",
+        "level": "متوسط",
+        "question": "ما الذي تضيفه الرقابة البعدية ولا توفره الرقابة القبلية؟",
+        "options": [
+            "التحقق من توفر الاعتمادات",
+            "تقييم الأداء واسترداد الأموال المهدورة أو المختلَسة",
+            "التأشير على وثائق الالتزام",
+            "التحقق من صفة الآمر بالصرف"
+        ],
+        "answer": 1,
+        "explanation": "الرقابة القبلية تركز على الشرعية وتوفر الاعتمادات، أما البعدية فتضيف بُعد تقييم الأداء وتحديد المسؤوليات والاسترداد."
+    },
+    {
+        "topic": "الرقابة البعدية",
+        "icon": "🔬",
+        "color": "#f472b6",
+        "level": "صعب",
+        "question": "لماذا يُعد ضمان استقلالية أجهزة الرقابة البعدية عن السلطة التنفيذية تحديًا جوهريًا؟",
+        "options": [
+            "لأنها تكلف الدولة مبالغ كبيرة",
+            "لأن الاستقلالية شرط لحياديتها وفعاليتها في تقييم أداء الحكومة نفسها",
+            "لأنها تبطئ إجراءات الصرف",
+            "لأنها تتطلب موافقة البرلمان على كل تقرير"
+        ],
+        "answer": 1,
+        "explanation": "تحديات الرقابة البعدية: صعوبة الاسترداد، التأخير في الكشف، نقص الموارد، مقاومة التغيير، وضمان الاستقلالية."
+    },
+    {
+        "topic": "التفتيش المالي",
+        "icon": "🕵️",
+        "color": "#f472b6",
+        "level": "سهل",
+        "question": "ما الطبيعة المزدوجة للتفتيش المالي؟",
+        "options": [
+            "قضائي وتشريعي",
+            "وقائي وعلاجي في آن واحد",
+            "محاسبي وتجاري",
+            "داخلي وخارجي فقط"
+        ],
+        "answer": 1,
+        "explanation": "التفتيش المالي يمنع الأخطاء بوجوده المستمر (وقائي) ويكشفها بعد وقوعها ويحدد المسؤوليات (علاجي)."
+    },
+    {
+        "topic": "التفتيش المالي",
+        "icon": "🕵️",
+        "color": "#f472b6",
+        "level": "متوسط",
+        "question": "تفتيش الصفقات العمومية دون غيرها من العمليات يُصنَّف حسب طبيعة التفتيش ضمن:",
+        "options": [
+            "التفتيش العام",
+            "التفتيش الخاص أو الموضوعاتي",
+            "التفتيش المفاجئ",
+            "التفتيش المركزي"
+        ],
+        "answer": 1,
+        "explanation": "التصنيف حسب الطبيعة: عام (كل جوانب التدبير) أو خاص/موضوعاتي (جانب محدد كالصفقات أو الموارد البشرية)."
+    },
+    {
+        "topic": "التفتيش المالي",
+        "icon": "🕵️",
+        "color": "#f472b6",
+        "level": "متوسط",
+        "question": "أي صلاحية من صلاحيات المفتش المالي تسمح له بحجز وثائق تُعد دليلًا على مخالفة؟",
+        "options": [
+            "حق الاطلاع",
+            "حق التحقيق",
+            "حق المعاينة",
+            "حق الحجز"
+        ],
+        "answer": 3,
+        "explanation": "صلاحيات المفتش خمس: الاطلاع، التحقيق، المعاينة، الحجز، والتوصية."
+    },
+    {
+        "topic": "التفتيش المالي",
+        "icon": "🕵️",
+        "color": "#f472b6",
+        "level": "صعب",
+        "question": "ما القيد الجوهري على عمل أجهزة التفتيش المالي؟",
+        "options": [
+            "لا يمكنها الاطلاع على الوثائق السرية",
+            "محدودية صلاحياتها التنفيذية: تقتصر غالبًا على التوصية دون سلطة مباشرة لتطبيق العقوبات",
+            "لا تستطيع القيام بتفتيش مفاجئ",
+            "تعمل فقط على مستوى الجماعات الترابية"
+        ],
+        "answer": 1,
+        "explanation": "هذا هو الفرق الجوهري مع مجلس المحاسبة الذي يملك سلطة قضائية وعقابية (غرامات مالية)."
+    },
+    {
+        "topic": "الخزينة العمومية",
+        "icon": "🏛️",
+        "color": "#38bdf8",
+        "level": "سهل",
+        "question": "الخزينة العمومية هي:",
+        "options": [
+            "هيئة قضائية مستقلة للرقابة المالية",
+            "المؤسسة المالية للدولة التي تدير الإيرادات والنفقات والسيولة والمحاسبة العامة وتمويل الدولة",
+            "جهاز تفتيش تابع لرئاسة الحكومة",
+            "لجنة برلمانية مكلفة بالميزانية"
+        ],
+        "answer": 1,
+        "explanation": "الخزينة العمومية هي «القلب النابض» للنظام المالي والوديع الأمين لأموال الدولة، وجزء من وزارة المالية في معظم الدول."
+    },
+    {
+        "topic": "الخزينة العمومية",
+        "icon": "🏛️",
+        "color": "#38bdf8",
+        "level": "متوسط",
+        "question": "مبدأ وحدة الخزينة يعني:",
+        "options": [
+            "أن للدولة خزينة واحدة في العاصمة فقط",
+            "تجميع جميع الأموال العامة في حساب واحد أو مجموعة حسابات موحدة تحت إشراف الخزينة",
+            "أن المحاسب العمومي واحد في كل وزارة",
+            "أن الميزانية تُعد في وثيقة واحدة"
+        ],
+        "answer": 1,
+        "explanation": "وحدة الخزينة تضمن إدارة مركزية للسيولة وتمنع تشتت الأموال، وهي الأساس الذي تقوم عليه إدارة النقدية."
+    },
+    {
+        "topic": "الخزينة العمومية",
+        "icon": "🏛️",
+        "color": "#38bdf8",
+        "level": "متوسط",
+        "question": "أي مما يلي يُعد وظيفة ثانوية (مساعدة) للخزينة العمومية؟",
+        "options": [
+            "المحاسب المركزي للدولة",
+            "إدارة السيولة النقدية",
+            "وظيفة الإيداع لأموال بعض المؤسسات والجماعات الترابية والودائع القضائية",
+            "تمويل الدولة وإدارة الدين"
+        ],
+        "answer": 2,
+        "explanation": "الوظائف الرئيسية أربع: المحاسب المركزي، إدارة السيولة، تمويل الدولة، وتنفيذ الميزانية. أما الإيداع والرقابة وتقديم القروض والوساطة فوظائف ثانوية."
+    },
+    {
+        "topic": "الخزينة العمومية",
+        "icon": "🏛️",
+        "color": "#38bdf8",
+        "level": "صعب",
+        "question": "من يرأس الهيكل التنظيمي للخزينة العمومية؟",
+        "options": [
+            "وزير المالية",
+            "الخازن العام للدولة",
+            "الرئيس الأول لمجلس المحاسبة",
+            "المفتش العام للمالية"
+        ],
+        "answer": 1,
+        "explanation": "الهيكل يتكون من إدارة مركزية وشبكة مصالح لامركزية (خزائن جهوية وإقليمية)، وعلى رأسه الخازن العام للدولة."
+    },
+    {
+        "topic": "إدارة النقدية",
+        "icon": "💧",
+        "color": "#38bdf8",
+        "level": "سهل",
+        "question": "ما الهدف الأسمى لإدارة النقدية في القطاع العام؟",
+        "options": [
+            "تحقيق أرباح من المضاربة في الأسواق المالية",
+            "ضمان توفر السيولة الكافية لتغطية النفقات في الوقت المحدد",
+            "خفض عدد الحسابات المصرفية للدولة",
+            "إلغاء الاقتراض نهائيًا"
+        ],
+        "answer": 1,
+        "explanation": "إدارة النقدية عملية ديناميكية توازن بين ثلاثة أبعاد: السيولة والربحية والأمان."
+    },
+    {
+        "topic": "إدارة النقدية",
+        "icon": "💧",
+        "color": "#38bdf8",
+        "level": "متوسط",
+        "question": "أي مكوّن يُعد «حجر الزاوية» في إدارة النقدية؟",
+        "options": [
+            "إدارة الحسابات المصرفية",
+            "التنبؤ بالتدفقات النقدية (Cash Forecasting)",
+            "توظيف الفوائض النقدية",
+            "نظم المعلومات والتقارير"
+        ],
+        "answer": 1,
+        "explanation": "التنبؤ الدقيق بالإيرادات والنفقات المستقبلية يعتمد على البيانات التاريخية والظروف الاقتصادية والسياسات الحكومية."
+    },
+    {
+        "topic": "إدارة النقدية",
+        "icon": "💧",
+        "color": "#38bdf8",
+        "level": "متوسط",
+        "question": "عند وجود فائض نقدي مؤقت، تقوم الخزينة العمومية بـ:",
+        "options": [
+            "توزيعه على الوزارات فورًا",
+            "توظيفه في أدوات استثمارية قصيرة الأجل ومنخفضة المخاطر",
+            "تحويله إلى الصندوق السيادي إلزاميًا",
+            "تجميده حتى نهاية السنة"
+        ],
+        "answer": 1,
+        "explanation": "أمثلة الأدوات: سندات الخزينة قصيرة الأجل والودائع لأجل، بهدف تحقيق عوائد إضافية للخزينة مع أمان عالٍ."
+    },
+    {
+        "topic": "إدارة النقدية",
+        "icon": "💧",
+        "color": "#38bdf8",
+        "level": "صعب",
+        "question": "عند وجود عجز نقدي مؤقت، ما الأداة التي تلجأ إليها الخزينة العمومية عادةً؟",
+        "options": [
+            "إصدار سندات حكومية طويلة الأجل",
+            "إصدار أذونات الخزينة (اقتراض قصير الأجل)",
+            "طلب قرض من صندوق النقد الدولي",
+            "تجميد رواتب الموظفين"
+        ],
+        "answer": 1,
+        "explanation": "تدبير الاقتراض قصير الأجل يتم عبر السوق المالية بإصدار أذونات الخزينة، مع السعي لتقليل تكلفة الاقتراض."
+    },
+    {
+        "topic": "ميزان المراجعة",
+        "icon": "⚖️",
+        "color": "#a78bfa",
+        "level": "سهل",
+        "question": "القاعدة الأساسية لميزان المراجعة هي:",
+        "options": [
+            "مجموع الإيرادات = مجموع النفقات",
+            "مجموع الأرصدة المدينة = مجموع الأرصدة الدائنة",
+            "مجموع الأصول = مجموع الإيرادات",
+            "مجموع الاعتمادات = مجموع المصروفات"
+        ],
+        "answer": 1,
+        "explanation": "هذه القاعدة مبنية على مبدأ القيد المزدوج: لكل عملية طرفان متساويان في القيمة، أحدهما مدين والآخر دائن."
+    },
+    {
+        "topic": "ميزان المراجعة",
+        "icon": "⚖️",
+        "color": "#a78bfa",
+        "level": "متوسط",
+        "question": "إذا سُجلت عملية مالية في حساب خاطئ لكن بنفس طبيعة الحساب، فهذا خطأ:",
+        "options": [
+            "خطأ الحذف",
+            "خطأ الارتكاب",
+            "خطأ التعويض",
+            "خطأ التكرار"
+        ],
+        "answer": 1,
+        "explanation": "خطأ الارتكاب لا يخل بالتوازن لأنه مدين بدل مدين آخر أو دائن بدل دائن آخر، لذلك لا يكشفه ميزان المراجعة."
+    },
+    {
+        "topic": "ميزان المراجعة",
+        "icon": "⚖️",
+        "color": "#a78bfa",
+        "level": "متوسط",
+        "question": "أي فئة من الحسابات يكون رصيدها دائنًا بطبيعتها؟",
+        "options": [
+            "الأصول والمصروفات",
+            "الخصوم والإيرادات وحقوق الملكية",
+            "المصروفات وحقوق الملكية",
+            "الأصول والإيرادات"
+        ],
+        "answer": 1,
+        "explanation": "الحسابات ذات الطبيعة المدينة: الأصول والمصروفات. وذات الطبيعة الدائنة: الخصوم والإيرادات وحقوق الملكية."
+    },
+    {
+        "topic": "ميزان المراجعة",
+        "icon": "⚖️",
+        "color": "#a78bfa",
+        "level": "صعب",
+        "question": "تسجيل نفقة رأسمالية على أنها نفقة جارية يُعد:",
+        "options": [
+            "خطأ حذف",
+            "خطأ تعويض",
+            "خطأ مبدأ",
+            "خطأ تكرار"
+        ],
+        "answer": 2,
+        "explanation": "خطأ المبدأ هو تسجيل خاطئ من حيث طبيعة الحساب. وهو من الأخطاء الخمسة التي لا يكشفها ميزان المراجعة رغم خطورتها."
+    },
+    {
+        "topic": "الحساب الإداري",
+        "icon": "📑",
+        "color": "#a78bfa",
+        "level": "سهل",
+        "question": "من يُعد الحساب الإداري؟",
+        "options": [
+            "المحاسب العمومي",
+            "الآمر بالصرف (الوزير، رئيس المؤسسة العمومية، رئيس الجماعة الترابية)",
+            "مجلس المحاسبة",
+            "المراقب المالي"
+        ],
+        "answer": 1,
+        "explanation": "الحساب الإداري تقرير عن الأداء المالي للآمر بالصرف، يُقدَّم في نهاية السنة للجهات الرقابية والتشريعية للمصادقة."
+    },
+    {
+        "topic": "الحساب الإداري",
+        "icon": "📑",
+        "color": "#a78bfa",
+        "level": "متوسط",
+        "question": "ما الفرق بين الحساب الإداري وحساب التسيير؟",
+        "options": [
+            "الأول سنوي والثاني شهري",
+            "الأول يعده الآمر بالصرف بنظرة إدارية وفنية، والثاني يعده المحاسب العمومي بنظرة محاسبية وقانونية",
+            "الأول يخص الإيرادات والثاني يخص النفقات",
+            "الأول للدولة والثاني للجماعات الترابية"
+        ],
+        "answer": 1,
+        "explanation": "التوافق بين الوثيقتين مؤشر على سلامة التدبير المالي وشفافيته، والجهات الرقابية مطالَبة بالتأكد منه."
+    },
+    {
+        "topic": "الحساب الإداري",
+        "icon": "📑",
+        "color": "#a78bfa",
+        "level": "متوسط",
+        "question": "ما هي المقارنة الجوهرية التي يقدمها الحساب الإداري؟",
+        "options": [
+            "مقارنة بين إيرادات الدولة وإيرادات الجماعات المحلية",
+            "مقارنة بين التقديرات الميزانياتية والإنجازات الفعلية مع إظهار الفروقات",
+            "مقارنة بين الأرصدة المدينة والدائنة",
+            "مقارنة بين الدين الداخلي والخارجي"
+        ],
+        "answer": 1,
+        "explanation": "هذه المقارنة تمكّن من تقييم أداء الآمر بالصرف وتحديد نقاط القوة والضعف في التدبير المالي."
+    },
+    {
+        "topic": "الحساب الإداري",
+        "icon": "📑",
+        "color": "#a78bfa",
+        "level": "صعب",
+        "question": "أي تحدٍّ ينفرد به إعداد الحساب الإداري؟",
+        "options": [
+            "ضخامة عدد الحسابات الفرعية",
+            "الضغط السياسي على الآمرين بالصرف لتجميل الأرقام أو إخفاء بعض الحقائق",
+            "نقص السيولة في الخزينة",
+            "صعوبة التنبؤ بالتدفقات النقدية"
+        ],
+        "answer": 1,
+        "explanation": "تحديات الحساب الإداري: دقة البيانات، التأخير في الإعداد، تعقيد الميزانيات، نقص الكفاءات، والضغط السياسي."
+    },
+    {
+        "topic": "مجلس المحاسبة",
+        "icon": "⚱️",
+        "color": "#f472b6",
+        "level": "سهل",
+        "question": "ما الطبيعة القانونية لمجلس المحاسبة؟",
+        "options": [
+            "جهاز إداري تابع لوزارة المالية",
+            "هيئة قضائية عليا دستورية مستقلة عن السلطتين التنفيذية والتشريعية",
+            "لجنة برلمانية دائمة",
+            "مؤسسة استشارية غير ملزمة"
+        ],
+        "answer": 1,
+        "explanation": "استقلاليته التامة هي ما يضمن حياديته وفعاليته، وهو يمارس رقابة لاحقة على المال العام."
+    },
+    {
+        "topic": "مجلس المحاسبة",
+        "icon": "⚱️",
+        "color": "#f472b6",
+        "level": "متوسط",
+        "question": "«البتّ في حسابات المحاسبين العموميين» يندرج ضمن صلاحيات مجلس المحاسبة:",
+        "options": [
+            "الرقابية",
+            "الاستشارية",
+            "القضائية",
+            "التشريعية"
+        ],
+        "answer": 2,
+        "explanation": "الصلاحيات القضائية تشمل أيضًا تأديب المسؤولين عن أخطاء التسيير (غرامات مالية) وإحالة قضايا الاختلاس للقضاء الجنائي."
+    },
+    {
+        "topic": "مجلس المحاسبة",
+        "icon": "⚱️",
+        "color": "#f472b6",
+        "level": "متوسط",
+        "question": "صلاحيات مجلس المحاسبة تُصنَّف إلى ثلاثة أصناف هي:",
+        "options": [
+            "تشريعية وتنفيذية وقضائية",
+            "قضائية ورقابية واستشارية",
+            "مالية وإدارية واقتصادية",
+            "داخلية وخارجية ودولية"
+        ],
+        "answer": 1,
+        "explanation": "الصلاحيات القضائية (البتّ والتأديب)، الرقابية (مراقبة تنفيذ قوانين المالية والمؤسسات والجماعات وتقييم البرامج)، والاستشارية."
+    },
+    {
+        "topic": "مجلس المحاسبة",
+        "icon": "⚱️",
+        "color": "#f472b6",
+        "level": "صعب",
+        "question": "ما الفرق الجوهري بين مجلس المحاسبة وأجهزة التفتيش المالي؟",
+        "options": [
+            "التفتيش يمارس رقابة قبلية والمجلس رقابة بعدية",
+            "المجلس هيئة قضائية يملك سلطة عقابية (غرامات مالية والبتّ في الحسابات)، بينما التفتيش جهاز إداري يقتصر على التوصية",
+            "التفتيش مستقل والمجلس تابع للحكومة",
+            "المجلس يراقب الجماعات الترابية فقط والتفتيش يراقب الدولة"
+        ],
+        "answer": 1,
+        "explanation": "كلاهما يمارس رقابة لاحقة، لكن الفارق الحاسم هو السلطة القضائية والعقابية التي ينفرد بها مجلس المحاسبة."
+    }
 ]
 
-# ── Session state init ─────────────────────────────────────────────────────────
-def init_state():
+# ─────────────────────────────────────────────────────────────────────────────
+#  GESTION D'ÉTAT DE SESSION
+# ─────────────────────────────────────────────────────────────────────────────
+
+def init_session_state():
     defaults = {
-        "q_index": 0,
-        "score": 0,
-        "answered": False,
-        "selected": None,
-        "finished": False,
-        "wrong_list": [],
+        "screen": "home",           # home | quiz | done
+        "levels": ["سهل", "متوسط", "صعب"],
+        "n": 30,                    # nombre de questions à sélectionner
+        "deck": [],                 # liste des questions mélangées et réduites
+        "index": 0,                 # index courant dans deck
+        "score": 0,                 # nombre de bonnes réponses
+        "selected": None,           # indice de l'option choisie
+        "answered": False,          # True si la question a été répondue
+        "wrong": []                 # liste des indices des questions ratées
     }
     for k, v in defaults.items():
         if k not in st.session_state:
             st.session_state[k] = v
 
-init_state()
+init_session_state()
 
-LETTERS = ["A", "B", "C", "D"]
-TOTAL   = len(QUESTIONS)
 
-# ── Global styles ──────────────────────────────────────────────────────────────
+# ─────────────────────────────────────────────────────────────────────────────
+#  FONCTIONS UTILITAIRES
+# ─────────────────────────────────────────────────────────────────────────────
+
+LETTERS = ["أ", "ب", "ج", "د"]
+LEVEL_COLORS = {"سهل": "#34d399", "متوسط": "#38bdf8", "صعب": "#f87171"}
+
+def esc_html(text):
+    """Échappe les caractères HTML pour éviter les injections."""
+    return str(text).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+def build_deck():
+    """Sélectionne et mélange les questions selon les niveaux et le nombre choisis."""
+    pool = [q for q in DATA if q["level"] in st.session_state.levels]
+    random.shuffle(pool)
+    pool = pool[:min(st.session_state.n, len(pool))]
+    # Mélanger les options de chaque question
+    for q in pool:
+        indices = list(range(4))
+        random.shuffle(indices)
+        q["options"] = [q["options"][i] for i in indices]
+        q["answer"] = indices.index(q["answer"])
+    st.session_state.deck = pool
+    st.session_state.index = 0
+    st.session_state.score = 0
+    st.session_state.selected = None
+    st.session_state.answered = False
+    st.session_state.wrong = []
+    st.session_state.screen = "quiz"
+
+def render_home():
+    st.markdown("""
+    <div style="text-align:center; margin-bottom:10px;">
+        <h1 style="font-size:1.9rem; font-weight:800;">🏛️ الإدارة المالية العمومية</h1>
+        <p style="color:#5a6788;">بنك أسئلة QCM — 120 سؤالًا · 30 موضوعًا · مسابقة مراقب الخزينة</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    with st.container():
+        st.markdown('<div class="card">', unsafe_allow_html=True)
+
+        st.markdown("<label>المستويات المطلوبة</label>", unsafe_allow_html=True)
+        cols = st.columns(3)
+        for i, level in enumerate(["سهل", "متوسط", "صعب"]):
+            with cols[i]:
+                if st.button(
+                    level,
+                    key=f"level_{level}",
+                    use_container_width=True,
+                    type="primary" if level in st.session_state.levels else "secondary"
+                ):
+                    if level in st.session_state.levels:
+                        st.session_state.levels.remove(level)
+                    else:
+                        st.session_state.levels.append(level)
+                    if not st.session_state.levels:
+                        st.session_state.levels = [level]
+                    st.rerun()
+
+        st.markdown("<label>عدد الأسئلة</label>", unsafe_allow_html=True)
+        n_options = [10, 20, 30, 50, 80, 120]
+        current_n = st.session_state.n
+        selected_n = st.selectbox(
+            "اختر عدد الأسئلة",
+            options=n_options,
+            index=n_options.index(current_n) if current_n in n_options else 2,
+            label_visibility="collapsed"
+        )
+        st.session_state.n = selected_n
+
+        avail = len([q for q in DATA if q["level"] in st.session_state.levels])
+        st.markdown(f"<div style='color:#5a6788;font-size:0.8rem;margin-top:6px;'>المتاح بهذه المستويات: {avail} سؤالًا</div>", unsafe_allow_html=True)
+
+        if st.button("🚀 ابدأ الاختبار", use_container_width=True, type="primary"):
+            build_deck()
+            st.rerun()
+
+        st.markdown("</div>", unsafe_allow_html=True)
+
+def render_quiz():
+    deck = st.session_state.deck
+    if not deck:
+        st.warning("لا توجد أسئلة مطابقة. ارجع إلى الصفحة الرئيسية.")
+        if st.button("العودة إلى الصفحة الرئيسية"):
+            st.session_state.screen = "home"
+            st.rerun()
+        return
+
+    idx = st.session_state.index
+    q = deck[idx]
+    total = len(deck)
+    color = q["color"]
+    answered = st.session_state.answered
+    selected = st.session_state.selected
+    correct = q["answer"]
+
+    # Barre de progression
+    progress = int((idx / total) * 100)
+    st.markdown(f"""
+    <div style="width:100%; height:5px; background:rgba(255,255,255,0.07); border-radius:99px; overflow:hidden; margin-bottom:22px;">
+        <div style="width:{progress}%; height:100%; border-radius:99px; background:{color}; transition:width 0.45s;"></div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # En-tête
+    col1, col2 = st.columns([2, 1])
+    with col1:
+        st.markdown(f"""
+        <span style="display:inline-block; font-size:0.7rem; font-weight:700; padding:3px 12px; border-radius:99px; border:1px solid {color}55; background:{color}18; color:{color};">{q['icon']} {q['topic']}</span>
+        <span style="display:inline-block; font-size:0.7rem; font-weight:700; padding:3px 12px; border-radius:99px; border:1px solid {LEVEL_COLORS[q['level']]}55; background:{LEVEL_COLORS[q['level']]}18; color:{LEVEL_COLORS[q['level']]}; margin-right:6px;">{q['level']}</span>
+        """, unsafe_allow_html=True)
+    with col2:
+        st.markdown(f"""
+        <div style="text-align:left; font-size:0.7rem; color:#5a6788;">
+            {idx+1} / {total}<br>✅ {st.session_state.score} نقطة
+        </div>
+        """, unsafe_allow_html=True)
+
+    # Question
+    st.markdown(f'<div style="font-size:1.12rem; font-weight:700; color:#f0f4ff; margin:8px 0 22px;">{esc_html(q["question"])}</div>', unsafe_allow_html=True)
+
+    # Options
+    if not answered:
+        for i, opt in enumerate(q["options"]):
+            letter = LETTERS[i]
+            if st.button(f"{letter}.  {opt}", key=f"opt_{idx}_{i}", use_container_width=True):
+                st.session_state.selected = i
+                st.session_state.answered = True
+                if i == correct:
+                    st.session_state.score += 1
+                else:
+                    st.session_state.wrong.append(idx)
+                st.rerun()
+    else:
+        for i, opt in enumerate(q["options"]):
+            letter = LETTERS[i]
+            if i == correct:
+                css = "background:rgba(52,211,153,0.12)!important; border-color:#34d399!important; color:#34d399!important; font-weight:700;"
+                sym = "✓"
+            elif i == selected and i != correct:
+                css = "background:rgba(248,113,113,0.12)!important; border-color:#f87171!important; color:#f87171!important; font-weight:700;"
+                sym = "✗"
+            else:
+                css = "opacity:0.35;"
+                sym = letter
+            st.markdown(f"""
+            <div style="width:100%; text-align:right; padding:14px 18px; border-radius:14px; margin-bottom:8px; border:1.5px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.04); color:#c8d2f0; font-size:0.95rem; display:flex; gap:12px; align-items:center; line-height:1.65; {css}">
+                <span style="width:28px; height:28px; border-radius:8px; display:flex; align-items:center; justify-content:center; background:rgba(255,255,255,0.07); font-size:0.78rem; font-weight:700; flex-shrink:0;">{sym}</span>
+                <span>{esc_html(opt)}</span>
+            </div>
+            """, unsafe_allow_html=True)
+
+        # Feedback
+        if selected == correct:
+            st.markdown(f"""
+            <div style="padding:15px 18px; border-radius:14px; margin-top:16px; font-size:0.9rem; border-right:4px solid #34d399; background:rgba(52,211,153,0.09); color:#a7f3d0;">
+                <strong>✅ إجابة صحيحة</strong><br>{esc_html(q['explanation'])}
+            </div>
+            """, unsafe_allow_html=True)
+        else:
+            st.markdown(f"""
+            <div style="padding:15px 18px; border-radius:14px; margin-top:16px; font-size:0.9rem; border-right:4px solid #f87171; background:rgba(248,113,113,0.09); color:#fecaca;">
+                <strong>❌ إجابة خاطئة.</strong> الجواب الصحيح: <strong>{LETTERS[correct]}. {esc_html(q['options'][correct])}</strong><br><br>{esc_html(q['explanation'])}
+            </div>
+            """, unsafe_allow_html=True)
+
+        # Bouton suivant / fin
+        is_last = (idx == total - 1)
+        btn_label = "🏁 عرض النتيجة" if is_last else "السؤال التالي ←"
+        if st.button(btn_label, use_container_width=True, type="primary"):
+            if is_last:
+                st.session_state.screen = "done"
+            else:
+                st.session_state.index += 1
+                st.session_state.selected = None
+                st.session_state.answered = False
+            st.rerun()
+
+def render_done():
+    total = len(st.session_state.deck)
+    score = st.session_state.score
+    pct = int(score / total * 100) if total > 0 else 0
+
+    if pct >= 80:
+        color = "#34d399"; icon = "🏆"; label = "تمكّن ممتاز — أنت جاهز"
+    elif pct >= 60:
+        color = "#38bdf8"; icon = "✨"; label = "فهم جيد — راجع نقاط الضعف"
+    elif pct >= 40:
+        color = "#fb923c"; icon = "📚"; label = "يحتاج إلى تثبيت"
+    else:
+        color = "#f87171"; icon = "🔄"; label = "أعد قراءة الملخص من البداية"
+
+    st.markdown(f"""
+    <div style="text-align:center; background:linear-gradient(145deg,#0d1525,#131e35); border-radius:22px; padding:30px 20px; border:1px solid rgba(255,255,255,0.08);">
+        <div style="font-size:2.8rem;">{icon}</div>
+        <div style="font-size:4.6rem; font-weight:800; line-height:1; color:{color};">{score}<span style="font-size:1.9rem; color:#2a3450;">/{total}</span></div>
+        <div style="font-size:1.5rem; font-weight:700; margin-top:8px;">{pct} %</div>
+        <div style="color:#64748b;">{label}</div>
+        <hr style="border:0; border-top:1px solid rgba(255,255,255,0.08); margin:22px 0;">
+        <div style="display:flex; justify-content:center; gap:34px; flex-wrap:wrap;">
+            <div><div style="font-size:1.7rem; font-weight:800; color:#34d399;">{score}</div><div style="font-size:0.72rem; color:#5a6788;">صحيحة</div></div>
+            <div><div style="font-size:1.7rem; font-weight:800; color:#f87171;">{total - score}</div><div style="font-size:0.72rem; color:#5a6788;">خاطئة</div></div>
+            <div><div style="font-size:1.7rem; font-weight:800; color:#38bdf8;">{total}</div><div style="font-size:0.72rem; color:#5a6788;">المجموع</div></div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    # Affichage des questions fausses
+    if st.session_state.wrong:
+        st.markdown("<div style='font-weight:700; margin:22px 0 12px;'>❌ أسئلة تحتاج إلى مراجعة</div>", unsafe_allow_html=True)
+        for idx in st.session_state.wrong:
+            q = st.session_state.deck[idx]
+            st.markdown(f"""
+            <div style="background:rgba(248,113,113,0.06); border:1px solid rgba(248,113,113,0.18); border-radius:12px; padding:13px 16px; margin-bottom:10px; font-size:0.88rem;">
+                <div style="font-size:0.73rem; color:#6b7a9e; margin-bottom:4px;">{q['icon']} {q['topic']} · {q['level']}</div>
+                <div style="color:#e0e8ff; font-weight:700; margin-bottom:4px;">{esc_html(q['question'])}</div>
+                <div style="color:#a7f3d0;">✅ {LETTERS[q['answer']]}. {esc_html(q['options'][q['answer']])}</div>
+                <div style="color:#9aa8c8; font-size:0.84rem; margin-top:5px;">{esc_html(q['explanation'])}</div>
+            </div>
+            """, unsafe_allow_html=True)
+
+    if st.button("🔄 اختبار جديد", use_container_width=True):
+        st.session_state.screen = "home"
+        st.rerun()
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+#  ROUTAGE PRINCIPAL
+# ─────────────────────────────────────────────────────────────────────────────
+
+# CSS personnalisé global (injecté une fois)
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+/* Réinitialisation et police */
+* { box-sizing: border-box; margin:0; padding:0; }
+body { font-family: 'Cairo', system-ui, sans-serif; background:#07090f; color:#e0e8ff; line-height:1.7; }
+.stApp { background: #07090f; }
+.block-container { padding: 20px 14px 60px; max-width: 760px; margin:0 auto; }
 
-*, *::before, *::after { box-sizing: border-box; }
-html, body, [class*="css"], .stApp {
-    font-family: 'Syne', sans-serif !important;
-    background: #07090f !important;
-    color: #e0e8ff !important;
-}
-#MainMenu, footer, header { visibility: hidden; }
-.block-container { padding: 2.5rem 1rem 5rem !important; max-width: 760px !important; }
-
-/* ── progress ── */
-.prog-track {
-    width: 100%; height: 5px;
-    background: rgba(255,255,255,0.07);
-    border-radius: 99px; overflow: hidden;
-    margin-bottom: 30px;
-}
-.prog-fill { height: 100%; border-radius: 99px; transition: width .5s ease; }
-
-/* ── header row ── */
-.hdr-row {
-    display: flex; align-items: center;
-    justify-content: space-between;
-    margin-bottom: 18px;
-}
-.badge {
-    display: inline-flex; align-items: center; gap: 6px;
-    font-family: 'DM Mono', monospace;
-    font-size: 0.68rem; letter-spacing: 2px; text-transform: uppercase;
-    padding: 5px 13px; border-radius: 99px; border: 1px solid;
-}
-.counter {
-    font-family: 'DM Mono', monospace; font-size: 0.72rem; color: #3a4460;
-}
-
-/* ── score mini ── */
-.score-mini {
-    font-family: 'DM Mono', monospace; font-size: 0.72rem;
-    color: #3a4460; text-align: right; margin-bottom: 4px;
-}
-
-/* ── question text ── */
-.q-text {
-    font-size: 1.22rem; font-weight: 700; line-height: 1.55;
-    color: #f0f4ff; margin-bottom: 30px;
-}
-
-/* ── option buttons (rendered via st.button) ── */
+/* Boutons Streamlit personnalisés */
 .stButton > button {
-    width: 100% !important;
-    text-align: left !important;
-    padding: 14px 20px !important;
+    font-family: 'Cairo', system-ui, sans-serif !important;
     border-radius: 14px !important;
-    border: 1.5px solid rgba(255,255,255,0.1) !important;
+    font-weight: 700 !important;
+    transition: opacity 0.2s;
     background: rgba(255,255,255,0.04) !important;
+    border: 1.5px solid rgba(255,255,255,0.1) !important;
     color: #c8d2f0 !important;
-    font-family: 'Syne', sans-serif !important;
-    font-size: 0.93rem !important;
-    font-weight: 500 !important;
-    margin-bottom: 2px !important;
-    cursor: pointer !important;
-    transition: all 0.18s !important;
-    letter-spacing: 0.1px !important;
-    justify-content: flex-start !important;
+    padding: 14px !important;
+    font-size: 0.95rem !important;
 }
 .stButton > button:hover {
     background: rgba(255,255,255,0.09) !important;
     border-color: rgba(255,255,255,0.25) !important;
     color: #fff !important;
 }
-
-/* ── reviewed options (HTML divs) ── */
-.opt {
-    width: 100%;
-    padding: 14px 20px;
-    border-radius: 14px;
-    border: 1.5px solid rgba(255,255,255,0.1);
-    background: rgba(255,255,255,0.04);
-    color: #c8d2f0;
-    font-size: 0.93rem;
-    margin-bottom: 8px;
-    display: flex; align-items: center; gap: 12px;
-}
-.opt-correct { background: rgba(52,211,153,0.12) !important; border-color: #34d399 !important; color: #34d399 !important; font-weight: 700; }
-.opt-wrong   { background: rgba(248,113,113,0.12) !important; border-color: #f87171 !important; color: #f87171 !important; font-weight: 700; }
-.opt-dim     { opacity: 0.35; }
-
-.ltr {
-    width: 28px; height: 28px; border-radius: 8px;
-    display: flex; align-items: center; justify-content: center;
-    font-family: 'DM Mono', monospace; font-size: 0.72rem; font-weight: 600;
-    background: rgba(255,255,255,0.07); flex-shrink: 0;
-}
-
-/* ── feedback ── */
-.fb {
-    padding: 16px 20px; border-radius: 14px;
-    margin-top: 18px; font-size: 0.88rem; line-height: 1.65;
-    border-left: 4px solid;
-}
-.fb-ok  { background: rgba(52,211,153,0.09);  border-color: #34d399; color: #a7f3d0; }
-.fb-err { background: rgba(248,113,113,0.09); border-color: #f87171; color: #fecaca; }
-
-/* ── next / finish button ── */
-.next-wrap > .stButton > button {
+.stButton > button[kind="primary"] {
     background: linear-gradient(135deg,#6366f1,#38bdf8) !important;
-    color: #fff !important; font-weight: 700 !important;
-    font-size: 0.97rem !important; letter-spacing: 0.4px !important;
-    border: none !important; border-radius: 14px !important;
-    padding: 14px 28px !important; margin-top: 14px !important;
-}
-.next-wrap > .stButton > button:hover { opacity: 0.85 !important; }
-
-/* ── score card ── */
-.score-card {
-    border-radius: 24px; padding: 50px 32px 40px;
-    text-align: center;
-    background: linear-gradient(145deg,#0d1525,#131e35);
-    border: 1px solid rgba(255,255,255,0.08);
-}
-.s-num  { font-size: 5.5rem; font-weight: 800; font-family: 'DM Mono', monospace; line-height: 1; }
-.s-pct  { font-size: 1.6rem; font-weight: 700; color: #e0e8ff; margin-top: 10px; }
-.s-lbl  { font-size: 0.9rem; color: #64748b; margin-top: 6px; }
-.s-grid { display: flex; justify-content: center; gap: 48px; flex-wrap: wrap; margin-top: 28px; }
-.s-stat { text-align: center; }
-.s-stat-n { font-size: 1.8rem; font-weight: 800; font-family: 'DM Mono', monospace; }
-.s-stat-l { font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; color: #3a4460; margin-top: 2px; }
-
-.div-line { border: none; border-top: 1px solid rgba(255,255,255,0.07); margin: 28px 0; }
-
-/* wrong list */
-.wrong-item {
-    background: rgba(248,113,113,0.06); border: 1px solid rgba(248,113,113,0.18);
-    border-radius: 12px; padding: 14px 18px; margin-bottom: 10px;
-    font-size: 0.87rem; color: #fca5a5; line-height: 1.55;
-}
-.wrong-q { color: #e0e8ff; margin-bottom: 5px; font-weight: 600; }
-.wrong-a { color: #a7f3d0; }
-
-/* restart button */
-.restart-wrap > .stButton > button {
-    background: rgba(255,255,255,0.06) !important;
-    border: 1.5px solid rgba(255,255,255,0.15) !important;
-    color: #a0aec8 !important; font-weight: 600 !important;
-    border-radius: 14px !important; padding: 13px 28px !important;
-    margin-top: 14px !important;
-}
-.restart-wrap > .stButton > button:hover {
-    background: rgba(255,255,255,0.12) !important;
+    border: none !important;
     color: #fff !important;
 }
+.stButton > button[kind="primary"]:hover {
+    opacity: 0.88 !important;
+}
+.stButton > button[kind="secondary"] {
+    background: rgba(255,255,255,0.04) !important;
+    border: 1.5px solid rgba(255,255,255,0.14) !important;
+    color: #9aa8c8 !important;
+}
+.stButton > button[kind="secondary"]:hover {
+    background: rgba(255,255,255,0.08) !important;
+    border-color: rgba(255,255,255,0.25) !important;
+    color: #c7d2fe !important;
+}
+
+/* Select box */
+.stSelectbox > div > div {
+    background: rgba(255,255,255,0.05) !important;
+    border: 1.5px solid rgba(255,255,255,0.12) !important;
+    border-radius: 12px !important;
+    color: #e0e8ff !important;
+    font-family: 'Cairo', system-ui, sans-serif !important;
+}
+.stSelectbox label {
+    color: #9aa8c8 !important;
+    font-size: 0.86rem !important;
+    margin-bottom: 6px !important;
+}
+
+/* Chips (niveaux) - on utilise des boutons classiques, pas de chips personnalisés */
 </style>
 """, unsafe_allow_html=True)
 
-
-# ══════════════════════════════════════════════════════════════════════════════
-#  FINISHED SCREEN
-# ══════════════════════════════════════════════════════════════════════════════
-if st.session_state.finished:
-    score = st.session_state.score
-    pct   = int(score / TOTAL * 100)
-
-    if pct >= 80:
-        color = "#34d399"; icon = "🏆"; label = "Maîtrise excellente !"
-    elif pct >= 60:
-        color = "#38bdf8"; icon = "✨"; label = "Bonne compréhension"
-    elif pct >= 40:
-        color = "#fb923c"; icon = "📚"; label = "À consolider"
-    else:
-        color = "#f87171"; icon = "🔄"; label = "Reprenez le cours"
-
-    st.markdown(f"""
-    <div class="score-card">
-        <div style="font-size:3.2rem;margin-bottom:16px;">{icon}</div>
-        <div class="s-num" style="color:{color};">
-            {score}<span style="font-size:2rem;color:#2a3450;">/{TOTAL}</span>
-        </div>
-        <div class="s-pct">{pct} %</div>
-        <div class="s-lbl">{label}</div>
-        <hr class="div-line">
-        <div class="s-grid">
-            <div class="s-stat">
-                <div class="s-stat-n" style="color:#34d399;">{score}</div>
-                <div class="s-stat-l">Correctes</div>
-            </div>
-            <div class="s-stat">
-                <div class="s-stat-n" style="color:#f87171;">{TOTAL - score}</div>
-                <div class="s-stat-l">Incorrectes</div>
-            </div>
-            <div class="s-stat">
-                <div class="s-stat-n" style="color:#38bdf8;">{TOTAL}</div>
-                <div class="s-stat-l">Questions</div>
-            </div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-
-    if st.session_state.wrong_list:
-        st.markdown("<br>", unsafe_allow_html=True)
-        st.markdown("<div style='font-size:1rem;font-weight:700;color:#f0f4ff;margin-bottom:14px;'>❌ Questions à retravailler</div>", unsafe_allow_html=True)
-        for w in st.session_state.wrong_list:
-            q = QUESTIONS[w["idx"]]
-            st.markdown(f"""
-            <div class="wrong-item">
-                <div style="font-size:0.72rem;color:#6b7a9e;font-family:'DM Mono',monospace;
-                            letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;">
-                    {q['icon']} {q['topic']}
-                </div>
-                <div class="wrong-q">{q['question']}</div>
-                <div class="wrong-a">✅ {LETTERS[q['answer']]}. {q['options'][q['answer']]}</div>
-            </div>
-            """, unsafe_allow_html=True)
-
-    st.markdown("<br>", unsafe_allow_html=True)
-    st.markdown('<div class="restart-wrap">', unsafe_allow_html=True)
-    if st.button("🔄  Recommencer le quiz"):
-        for k in ["q_index","score","answered","selected","finished","wrong_list"]:
-            del st.session_state[k]
-        init_state()
-        st.rerun()
-    st.markdown("</div>", unsafe_allow_html=True)
-
-
-# ══════════════════════════════════════════════════════════════════════════════
-#  QUIZ SCREEN
-# ══════════════════════════════════════════════════════════════════════════════
+# Affichage de la page selon l'état
+if st.session_state.screen == "home":
+    render_home()
+elif st.session_state.screen == "quiz":
+    render_quiz()
+elif st.session_state.screen == "done":
+    render_done()
 else:
-    idx      = st.session_state.q_index
-    q        = QUESTIONS[idx]
-    acc      = q["color"]
-    answered = st.session_state.answered
-    selected = st.session_state.selected
-    correct  = q["answer"]
-    pct_fill = int(idx / TOTAL * 100)
-
-    # ── progress bar ──
-    st.markdown(f"""
-    <div class="prog-track">
-        <div class="prog-fill" style="width:{pct_fill}%;background:{acc};"></div>
-    </div>
-    """, unsafe_allow_html=True)
-
-    # ── header row ──
-    score_now = st.session_state.score
-    st.markdown(f"""
-    <div class="hdr-row">
-        <div class="badge" style="color:{acc};border-color:{acc}45;background:{acc}12;">
-            {q['icon']} {q['topic']}
-        </div>
-        <div style="text-align:right;">
-            <div class="counter">{idx+1} / {TOTAL}</div>
-            <div class="score-mini">✅ {score_now} pts</div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-
-    # ── question text ──
-    st.markdown(f'<div class="q-text">{q["question"]}</div>', unsafe_allow_html=True)
-
-    # ── options ──
-    if not answered:
-        for i, opt in enumerate(q["options"]):
-            ltr = LETTERS[i]
-            if st.button(f"{ltr}.  {opt}", key=f"opt_{idx}_{i}"):
-                st.session_state.selected = i
-                st.session_state.answered = True
-                if i == correct:
-                    st.session_state.score += 1
-                else:
-                    st.session_state.wrong_list.append({"idx": idx, "chosen": i})
-                st.rerun()
-    else:
-        for i, opt in enumerate(q["options"]):
-            ltr = LETTERS[i]
-            if i == correct:
-                css = "opt opt-correct"
-                sym = "✓"
-            elif i == selected and i != correct:
-                css = "opt opt-wrong"
-                sym = "✗"
-            else:
-                css = "opt opt-dim"
-                sym = ltr
-            st.markdown(f"""
-            <div class="{css}">
-                <span class="ltr">{sym}</span>{opt}
-            </div>
-            """, unsafe_allow_html=True)
-
-        # ── feedback ──
-        is_ok = selected == correct
-        if is_ok:
-            st.markdown(f"""
-            <div class="fb fb-ok">
-                <strong>✅ Correct !</strong><br>{q['explanation']}
-            </div>
-            """, unsafe_allow_html=True)
-        else:
-            st.markdown(f"""
-            <div class="fb fb-err">
-                <strong>❌ Incorrect.</strong>
-                Bonne réponse : <strong>{LETTERS[correct]}. {q['options'][correct]}</strong><br><br>
-                {q['explanation']}
-            </div>
-            """, unsafe_allow_html=True)
-
-        # ── next / finish ──
-        st.markdown("<br>", unsafe_allow_html=True)
-        is_last = (idx == TOTAL - 1)
-        lbl = "🏁  Voir mes résultats" if is_last else "Question suivante →"
-        st.markdown('<div class="next-wrap">', unsafe_allow_html=True)
-        if st.button(lbl, key="next_btn"):
-            if is_last:
-                st.session_state.finished = True
-            else:
-                st.session_state.q_index  += 1
-                st.session_state.answered  = False
-                st.session_state.selected  = None
-            st.rerun()
-        st.markdown("</div>", unsafe_allow_html=True)
+    st.error("État inconnu, retour à l'accueil.")
+    st.session_state.screen = "home"
+    st.rerun()
